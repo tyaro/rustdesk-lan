@@ -284,6 +284,10 @@ impl Client {
         }
 
         let other_server = interface.get_lch().read().unwrap().other_server.clone();
+        // LAN-only mode: reject ID-based connections when no rendezvous server is configured.
+        if other_server.is_none() && config::Config::get_rendezvous_servers().is_empty() {
+            bail!("LAN only mode: please enter the remote host IP address directly (e.g. 192.168.1.100)");
+        }
         let (peer, other_server, key, token) = if let Some((a, b, c)) = other_server.as_ref() {
             (a.as_ref(), b.as_ref(), c.as_ref(), "")
         } else {
@@ -293,6 +297,10 @@ impl Client {
             crate::get_rendezvous_server(1_000).await
         } else {
             if other_server == PUBLIC_SERVER {
+                // LAN-only mode: RENDEZVOUS_SERVERS may be empty; guard against panic.
+                if RENDEZVOUS_SERVERS.is_empty() {
+                    bail!("LAN only mode: no public rendezvous server is available");
+                }
                 (
                     check_port(RENDEZVOUS_SERVERS[0], RENDEZVOUS_PORT),
                     RENDEZVOUS_SERVERS[1..]

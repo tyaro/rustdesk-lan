@@ -102,6 +102,11 @@ impl RendezvousMediator {
             {
                 let mut futs = Vec::new();
                 let servers = Config::get_rendezvous_servers();
+                // LAN-only mode: skip rendezvous loop when no server is configured.
+                if servers.is_empty() {
+                    sleep(60.).await;
+                    continue;
+                }
                 SHOULD_EXIT.store(false, Ordering::SeqCst);
                 MANUAL_RESTARTED.store(false, Ordering::SeqCst);
                 for host in servers.clone() {
