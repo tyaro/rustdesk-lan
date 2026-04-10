@@ -581,45 +581,7 @@ impl Drop for CheckTestNatType {
 }
 
 pub fn test_nat_type() {
-    test_ipv6_sync();
-    use std::sync::atomic::{AtomicBool, Ordering};
-    std::thread::spawn(move || {
-        static IS_RUNNING: AtomicBool = AtomicBool::new(false);
-        if IS_RUNNING.load(Ordering::SeqCst) {
-            return;
-        }
-        IS_RUNNING.store(true, Ordering::SeqCst);
-
-        #[cfg(not(any(target_os = "android", target_os = "ios")))]
-        crate::ipc::get_socks_ws();
-        let is_direct = Config::get_socks().is_none() && !config::use_ws();
-        if !is_direct {
-            Config::set_nat_type(NatType::SYMMETRIC as _);
-            IS_RUNNING.store(false, Ordering::SeqCst);
-            return;
-        }
-
-        let mut i = 0;
-        loop {
-            match test_nat_type_() {
-                Ok(true) => break,
-                Err(err) => {
-                    log::error!("test nat: {}", err);
-                }
-                _ => {}
-            }
-            if Config::get_nat_type() != 0 {
-                break;
-            }
-            i = i * 2 + 1;
-            if i > 300 {
-                i = 300;
-            }
-            std::thread::sleep(std::time::Duration::from_secs(i));
-        }
-
-        IS_RUNNING.store(false, Ordering::SeqCst);
-    });
+    // LAN-only mode: skip NAT type test and STUN access.
 }
 
 #[tokio::main(flavor = "current_thread")]
@@ -2366,138 +2328,23 @@ async fn stun_ipv4_test(stun_server: &str) -> ResultType<(SocketAddr, String)> {
     })
 }
 
-static STUNS_V4: [&str; 3] = [
-    "stun.l.google.com:19302",
-    "stun.cloudflare.com:3478",
-    "stun.nextcloud.com:3478",
-];
-
-static STUNS_V6: [&str; 3] = [
-    "stun.l.google.com:19302",
-    "stun.cloudflare.com:3478",
-    "stun.nextcloud.com:3478",
-];
+// LAN-only mode: STUN servers disabled.
+static STUNS_V4: [&str; 0] = [];
+static STUNS_V6: [&str; 0] = [];
 
 pub async fn test_nat_ipv4() -> ResultType<(SocketAddr, String)> {
-    use hbb_common::futures::future::{select_ok, FutureExt};
-    let tests = STUNS_V4
-        .iter()
-        .map(|&stun| stun_ipv4_test(stun).boxed())
-        .collect::<Vec<_>>();
-
-    match select_ok(tests).await {
-        Ok(res) => {
-            return Ok(res.0);
-        }
-        Err(e) => {
-            bail!(
-                "Failed to get public IPv4 address via public STUN servers: {}",
-                e
-            );
-        }
-    };
+    // LAN-only mode: STUN IPv4 test disabled.
+    bail!("LAN-only mode: IPv4 STUN test disabled");
 }
 
 async fn test_bind_ipv6() -> ResultType<SocketAddr> {
-    let local_addr = SocketAddr::from(([0u16; 8], 0)); // [::]:0
-    let socket = UdpSocket::bind(local_addr).await?;
-    let addr = STUNS_V6[0]
-        .to_socket_addrs()?
-        .filter(|x| x.is_ipv6())
-        .next()
-        .ok_or_else(|| {
-            anyhow!(
-                "Failed to resolve STUN ipv6 server address: {}",
-                STUNS_V6[0]
-            )
-        })?;
-    socket.connect(addr).await?;
-    Ok(socket.local_addr()?)
+    // LAN-only mode: STUN IPv6 test disabled.
+    bail!("LAN-only mode: IPv6 STUN test disabled");
 }
 
 pub async fn test_ipv6() -> Option<tokio::task::JoinHandle<()>> {
-    if PUBLIC_IPV6_ADDR
-        .lock()
-        .unwrap()
-        .1
-        .map(|x| x.elapsed().as_secs() < 60)
-        .unwrap_or(false)
-    {
-        return None;
-    }
-    PUBLIC_IPV6_ADDR.lock().unwrap().1 = Some(Instant::now());
-
-    match test_bind_ipv6().await {
-        Ok(mut addr) => {
-            if let std::net::IpAddr::V6(ip) = addr.ip() {
-                if !ip.is_loopback()
-                    && !ip.is_unspecified()
-                    && !ip.is_multicast()
-                    && (ip.segments()[0] & 0xe000) == 0x2000
-                {
-                    addr.set_port(0);
-                    PUBLIC_IPV6_ADDR.lock().unwrap().0 = Some(addr);
-                    log::debug!("Found public IPv6 address locally: {}", addr);
-                }
-            }
-        }
-        Err(e) => {
-            log::warn!("Failed to bind IPv6 socket: {}", e);
-        }
-    }
-    // Interestingly, on my macOS, sometimes my ipv6 works, sometimes not (test with ping6 or https://test-ipv6.com/).
-    // I checked ifconfig, could not see any difference. Both secure ipv6 and temporary ipv6 are there.
-    // So we can not rely on the local ipv6 address queries with if_addrs.
-    // above test_bind_ipv6 is safer, because it can fail in this case.
-    /*
-    std::thread::spawn(|| {
-        if let Ok(ifaces) = if_addrs::get_if_addrs() {
-            for iface in ifaces {
-                if let if_addrs::IfAddr::V6(v6) = iface.addr {
-                    let ip = v6.ip;
-                    if !ip.is_loopback()
-                        && !ip.is_unspecified()
-                        && !ip.is_multicast()
-                        && !ip.is_unique_local()
-                        && !ip.is_unicast_link_local()
-                        && (ip.segments()[0] & 0xe000) == 0x2000
-                    {
-                        // only use the first one, on mac, the first one is the stable
-                        // one, the last one is the temporary one. The middle ones are deperecated.
-                        *PUBLIC_IPV6_ADDR.lock().unwrap() =
-                            Some((SocketAddr::from((ip, 0)), Instant::now()));
-                        log::debug!("Found public IPv6 address locally: {}", ip);
-                        break;
-                    }
-                }
-            }
-        }
-    });
-    */
-
-    Some(tokio::spawn(async {
-        use hbb_common::futures::future::{select_ok, FutureExt};
-        let tests = STUNS_V6
-            .iter()
-            .map(|&stun| stun_ipv6_test(stun).boxed())
-            .collect::<Vec<_>>();
-
-        match select_ok(tests).await {
-            Ok(res) => {
-                let mut addr = res.0 .0;
-                addr.set_port(0); // Set port to 0 to avoid conflicts
-                PUBLIC_IPV6_ADDR.lock().unwrap().0 = Some(addr);
-                log::debug!(
-                    "Found public IPv6 address via STUN server {}: {}",
-                    res.0 .1,
-                    addr
-                );
-            }
-            Err(e) => {
-                log::error!("Failed to get public IPv6 address: {}", e);
-            }
-        };
-    }))
+    // LAN-only mode: STUN IPv6 test disabled.
+    None
 }
 
 pub async fn punch_udp(
@@ -2552,13 +2399,7 @@ pub async fn punch_udp(
 }
 
 fn test_ipv6_sync() {
-    #[tokio::main(flavor = "current_thread")]
-    async fn func() {
-        if let Some(job) = test_ipv6().await {
-            job.await.ok();
-        }
-    }
-    std::thread::spawn(func);
+    // LAN-only mode: skip IPv6 STUN test.
 }
 
 pub async fn get_ipv6_socket() -> Option<(Arc<UdpSocket>, bytes::Bytes)> {
