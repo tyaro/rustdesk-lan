@@ -17,6 +17,10 @@ on:
       - "appimage/**"
       - "flatpak/**"
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   run-ci:
     uses: ./.github/workflows/flutter-build.yml

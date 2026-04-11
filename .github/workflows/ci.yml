@@ -24,6 +24,10 @@ on:
       - "appimage/**"
       - "flatpak/**"
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   generate-bridge:
     uses: ./.github/workflows/bridge.yml
@@ -190,11 +194,6 @@ jobs:
         use-cross: ${{ matrix.job.use-cross }}
         command: build
         args: --locked --target=${{ matrix.job.target }}
-
-    - name: clean
-      shell: bash
-      run: |
-        cargo clean
 
     # - name: Strip debug information from executable
     #   id: strip
