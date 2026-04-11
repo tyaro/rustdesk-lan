@@ -1,12 +1,9 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:math';
 
-import 'package:extended_text/extended_text.dart';
 import 'package:flutter_hbb/common/widgets/dialog.dart';
 import 'package:flutter_hbb/desktop/widgets/dragable_divider.dart';
 import 'package:percent_indicator/percent_indicator.dart';
-import 'package:desktop_drop/desktop_drop.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -83,7 +80,6 @@ class _FileManagerPageState extends State<FileManagerPage>
     with AutomaticKeepAliveClientMixin, WidgetsBindingObserver {
   final _mouseFocusScope = Rx<MouseFocusScope>(MouseFocusScope.none);
 
-  final _dropMaskVisible = false.obs; // TODO impl drop mask
   final _overlayKeyState = OverlayKeyState();
   final _uniqueKey = UniqueKey();
 
@@ -184,16 +180,7 @@ class _FileManagerPageState extends State<FileManagerPage>
   }
 
   Widget dropArea(FileManagerView fileView) {
-    return DropTarget(
-        onDragDone: (detail) =>
-            handleDragDone(detail, fileView.controller.isLocal),
-        onDragEntered: (enter) {
-          _dropMaskVisible.value = true;
-        },
-        onDragExited: (exit) {
-          _dropMaskVisible.value = false;
-        },
-        child: fileView);
+    return fileView;
   }
 
   Widget generateCard(Widget child) {
@@ -255,13 +242,10 @@ class _FileManagerPageState extends State<FileManagerPage>
                               Tooltip(
                                 waitDuration: Duration(milliseconds: 500),
                                 message: item.jobName,
-                                child: ExtendedText(
+                                child: Text(
                                   item.jobName,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
-                                  overflowWidget: TextOverflowWidget(
-                                      child: Text("..."),
-                                      position: TextOverflowPosition.start),
                                 ),
                               ),
                               Tooltip(
@@ -365,23 +349,6 @@ class _FileManagerPageState extends State<FileManagerPage>
                 : statusListView(jobController.jobTable),
           )),
     );
-  }
-
-  void handleDragDone(DropDoneDetails details, bool isLocal) {
-    if (isLocal) {
-      // ignore local
-      return;
-    }
-    final items = SelectedItems(isLocal: false);
-    for (var file in details.files) {
-      final f = File(file.path);
-      items.add(Entry()
-        ..path = file.path
-        ..name = file.name
-        ..size = FileSystemEntity.isDirectorySync(f.path) ? 0 : f.lengthSync());
-    }
-    final otherSideData = model.localController.directoryData();
-    model.remoteController.sendFiles(items, otherSideData);
   }
 }
 

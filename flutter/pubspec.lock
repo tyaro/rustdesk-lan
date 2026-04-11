@@ -322,14 +322,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.0"
-  desktop_drop:
-    dependency: "direct main"
-    description:
-      name: desktop_drop
-      sha256: d55a010fe46c8e8fcff4ea4b451a9ff84a162217bdb3b2a0aa1479776205e15d
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.4.4"
   desktop_multi_window:
     dependency: "direct main"
     description:
@@ -343,10 +335,10 @@ packages:
     dependency: "direct main"
     description:
       name: device_info_plus
-      sha256: "77f757b789ff68e4eaf9c56d1752309bd9f7ad557cb105b938a7f8eb89e59110"
+      sha256: "0042cb3b2a76413ea5f8a2b40cec2a33e01d0c937e91f0f7c211fde4f7739ba6"
       url: "https://pub.dev"
     source: hosted
-    version: "9.1.2"
+    version: "9.1.1"
   device_info_plus_platform_interface:
     dependency: transitive
     description:
@@ -388,30 +380,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.7"
-  extended_text:
-    dependency: "direct main"
-    description:
-      name: extended_text
-      sha256: f7716b0dd50cb0a0e00c366e9b70b9923981d20f001c9ca4ff85e3616d136a61
-      url: "https://pub.dev"
-    source: hosted
-    version: "13.1.0"
-  extended_text_library:
-    dependency: transitive
-    description:
-      name: extended_text_library
-      sha256: "13d99f8a10ead472d5e2cf4770d3d047203fe5054b152e9eb5dc692a71befbba"
-      url: "https://pub.dev"
-    source: hosted
-    version: "12.0.1"
-  external_path:
-    dependency: "direct main"
-    description:
-      name: external_path
-      sha256: "2095c626fbbefe70d5a4afc9b1137172a68ee2c276e51c3c1283394485bea8f4"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.3"
   ffi:
     dependency: "direct main"
     description:
@@ -440,10 +408,10 @@ packages:
     dependency: "direct main"
     description:
       name: file_picker
-      sha256: be325344c1f3070354a1d84a231a1ba75ea85d413774ec4bdf444c023342e030
+      sha256: "57d9a1dd5063f85fa3107fb42d1faffda52fdc948cefd5fe5ea85267a5fc7343"
       url: "https://pub.dev"
     source: hosted
-    version: "5.5.0"
+    version: "10.3.10"
   file_selector_linux:
     dependency: transitive
     description:
@@ -619,10 +587,10 @@ packages:
     dependency: "direct overridden"
     description:
       name: flutter_plugin_android_lifecycle
-      sha256: b068ffc46f82a55844acfa4fdbb61fad72fa2aef0905548419d97f0f95c456da
+      sha256: "38d1c268de9097ff59cf0e844ac38759fc78f76836d37edad06fa21e182055a0"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.17"
+    version: "2.0.34"
   flutter_rust_bridge:
     dependency: "direct main"
     description:
@@ -1103,10 +1071,9 @@ packages:
   qr_code_scanner:
     dependency: "direct main"
     description:
-      name: qr_code_scanner
-      sha256: f23b68d893505a424f0bd2e324ebea71ed88465d572d26bb8d2e78a4749591fd
-      url: "https://pub.dev"
-    source: hosted
+      path: "packages/qr_code_scanner"
+      relative: true
+    source: path
     version: "1.0.1"
   qr_flutter:
     dependency: "direct main"
@@ -1213,10 +1180,18 @@ packages:
     dependency: "direct main"
     description:
       name: sqflite
-      sha256: a9a8c6dfdf315f87f2a23a7bad2b60c8d5af0f88a5fde92cf9205202770c2753
+      sha256: e2297b1da52f127bc7a3da11439985d9b536f75070f3325e62ada69a5c585d03
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.0"
+    version: "2.4.2"
+  sqflite_android:
+    dependency: transitive
+    description:
+      name: sqflite_android
+      sha256: "2b3070c5fa881839f8b402ee4a39c1b4d561704d4ebbbcfb808a119bc2a1701b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.4.1"
   sqflite_common:
     dependency: transitive
     description:
@@ -1225,6 +1200,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.5.4+6"
+  sqflite_darwin:
+    dependency: transitive
+    description:
+      name: sqflite_darwin
+      sha256: "279832e5cde3fe99e8571879498c9211f3ca6391b0d818df4e17d9fff5c6ccb3"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.4.2"
+  sqflite_platform_interface:
+    dependency: transitive
+    description:
+      name: sqflite_platform_interface
+      sha256: "8dd4515c7bdcae0a785b0062859336de775e8c65db81ae33dd5445f35be61920"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.4.0"
   stack_trace:
     dependency: transitive
     description:
@@ -1325,11 +1316,9 @@ packages:
   uni_links:
     dependency: "direct main"
     description:
-      path: uni_links
-      ref: f416118d843a7e9ed117c7bb7bdc2deda5a9e86f
-      resolved-ref: f416118d843a7e9ed117c7bb7bdc2deda5a9e86f
-      url: "https://github.com/rustdesk-org/uni_links"
-    source: git
+      path: "packages/uni_links"
+      relative: true
+    source: path
     version: "0.5.1"
   uni_links_desktop:
     dependency: "direct main"
@@ -1519,10 +1508,10 @@ packages:
     dependency: "direct main"
     description:
       name: wakelock_plus
-      sha256: "104d94837bb28c735894dcd592877e990149c380e6358b00c04398ca1426eed4"
+      sha256: f268ca2116db22e57577fb99d52515a24bdc1d570f12ac18bb762361d43b043d
       url: "https://pub.dev"
     source: hosted
-    version: "1.2.1"
+    version: "1.1.4"
   wakelock_plus_platform_interface:
     dependency: transitive
     description:
@@ -1543,18 +1532,18 @@ packages:
     dependency: transitive
     description:
       name: web
-      sha256: "97da13628db363c635202ad97068d47c5b8aa555808e7a9411963c533b449b27"
+      sha256: "868d88a33d8a87b18ffc05f9f030ba328ffefba92d6c127917a2ba740f9cfe4a"
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.1"
+    version: "1.1.1"
   web_socket_channel:
     dependency: transitive
     description:
       name: web_socket_channel
-      sha256: "58c6666b342a38816b2e7e50ed0f1e261959630becd4c879c4f26bfa14aa5a42"
+      sha256: d88238e5eac9a42bb43ca4e721edba3c08c6354d4a53063afaa568516217621b
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.5"
+    version: "2.4.0"
   win32:
     dependency: "direct main"
     description:

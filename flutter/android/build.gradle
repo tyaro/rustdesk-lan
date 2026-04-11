@@ -1,7 +1,7 @@
 allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
         maven { url 'https://jitpack.io' }
     }
 }
@@ -12,6 +12,43 @@ subprojects {
 }
 subprojects {
     project.evaluationDependsOn(':app')
+}
+
+def configureAndroidSubproject = { Project subproject ->
+    if (!subproject.hasProperty('android')) {
+        return
+    }
+
+    def androidExt = subproject.android
+
+    if (androidExt.hasProperty('namespace')) {
+        def currentNamespace = androidExt.namespace
+        if (currentNamespace == null || currentNamespace.toString().trim().isEmpty()) {
+            def manifestFile = file("${subproject.projectDir}/src/main/AndroidManifest.xml")
+            def fallbackNamespace = null
+            if (manifestFile.exists()) {
+                def manifest = new XmlSlurper().parse(manifestFile)
+                def manifestPackage = manifest.@package?.text()
+                if (manifestPackage != null && !manifestPackage.trim().isEmpty()) {
+                    fallbackNamespace = manifestPackage.trim()
+                }
+            }
+            if (fallbackNamespace == null) {
+                fallbackNamespace = "dev.rustdesk.${subproject.name.replace('-', '_')}"
+            }
+            androidExt.namespace = fallbackNamespace
+        }
+    }
+
+}
+
+subprojects { subproject ->
+    subproject.plugins.withId('com.android.application') {
+        configureAndroidSubproject(subproject)
+    }
+    subproject.plugins.withId('com.android.library') {
+        configureAndroidSubproject(subproject)
+    }
 }
 
 tasks.register("clean", Delete) {
