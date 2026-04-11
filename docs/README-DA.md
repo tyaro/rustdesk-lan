@@ -21,13 +21,7 @@ RustDesk hilser bidrag fra alle velkommen. Se [`docs/CONTRIBUTING.md`](CONTRIBUT
 
 ## Afhængigheder
 
-Desktopversioner bruger [sciter](https://sciter.com/) eller Flutter til GUI, denne vejledning er kun for Sciter.
-
-Hent venligst sciter dynamic library selv.
-
-[Windows](https://raw.githubusercontent.com/c-smile/sciter-sdk/master/bin.win/x64/sciter.dll) |
-[Linux](https://raw.githubusercontent.com/c-smile/sciter-sdk/master/bin.lnx/x64/libsciter-gtk.so) |
-[MacOS](https://raw.githubusercontent.com/c-smile/sciter-sdk/master/bin.osx/libsciter.dylib)
+Desktop GUI now uses Flutter only.
 
 ## Rå trin til at bygge
 
@@ -95,8 +89,6 @@ source $HOME/.cargo/env
 git clone https://github.com/rustdesk/rustdesk
 cd rustdesk
 mkdir -p target/debug
-wget https://raw.githubusercontent.com/c-smile/sciter-sdk/master/bin.lnx/x64/libsciter-gtk.so
-mv libsciter-gtk.so target/debug
 cargo run
 ```
 
@@ -132,7 +124,7 @@ Sørg for, at du kører disse kommandoer fra roden af RustDesk-lageret, ellers k
 - **[libs/hbb_common](https://github.com/rustdesk/rustdesk/tree/master/libs/hbb_common)**: video codec, config, tcp/udp wrapper, protobuf, fs funktioner til filoverførsel og nogle andre hjælpefunktioner
 - **[libs/scrap](https://github.com/rustdesk/rustdesk/tree/master/libs/scrap)**: Skærmbillede
 - **[libs/enigo](https://github.com/rustdesk/rustdesk/tree/master/libs/enigo)**: platform specifik tastatur/mus kontrol
-- **[src/ui](https://github.com/rustdesk/rustdesk/tree/master/src/ui)**: GUI
+- **[flutter](https://github.com/rustdesk/rustdesk/tree/master/flutter)**: Flutter code for desktop and mobile UI
 - **[src/server](https://github.com/rustdesk/rustdesk/tree/master/src/server)**: lyd/udklipsholder/input/videotjenester og netværksforbindelser
 - **[src/client.rs](https://github.com/rustdesk/rustdesk/tree/master/src/client.rs)**: starte en peer-forbindelse
 - **[src/rendezvous_mediator.rs](https://github.com/rustdesk/rustdesk/tree/master/src/rendezvous_mediator.rs)**: Kommuniker med [rustdesk-server](https://github.com/rustdesk/rustdesk-server), vent på direkte fjernforbindelse (TCP-hulning) eller relæforbindelse
@@ -147,3 +139,4 @@ Sørg for, at du kører disse kommandoer fra roden af RustDesk-lageret, ellers k
 ![image](https://user-images.githubusercontent.com/71636191/113112857-3fbd5d80-923c-11eb-9836-768325faf906.png)
 
 ![image](https://user-images.githubusercontent.com/71636191/135385039-38fdbd72-379a-422d-b97f-33df71fb1cec.png)
+

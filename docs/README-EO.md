@@ -21,11 +21,7 @@ RustDesk bonvenigas kontribuon de ĉiuj. Vidu [`docs/CONTRIBUTING.md`](CONTRIBUT
 
 ## Dependantaĵoj
 
-La labortabla versio uzas [sciter](https://sciter.com/) por la interfaco, bonvolu elŝuti la bibliotekon dinamikan sciter.
-
-[Windows](https://raw.githubusercontent.com/c-smile/sciter-sdk/master/bin.win/x64/sciter.dll) |
-[Linux](https://raw.githubusercontent.com/c-smile/sciter-sdk/master/bin.lnx/x64/libsciter-gtk.so) |
-[MacOS](https://raw.githubusercontent.com/c-smile/sciter-sdk/master/bin.osx/libsciter.dylib)
+Desktop GUI now uses Flutter only.
 
 ## Paŝoj por kompili
 
@@ -91,8 +87,6 @@ source $HOME/.cargo/env
 git clone https://github.com/rustdesk/rustdesk
 cd rustdesk
 mkdir -p target/debug
-wget https://raw.githubusercontent.com/c-smile/sciter-sdk/master/bin.lnx/x64/libsciter-gtk.so
-mv libsciter-gtk.so target/debug
 VCPKG_ROOT=$HOME/vcpkg cargo run
 ```
 
@@ -131,7 +125,7 @@ Bonvolu certigi, ke vi plenumas tiujn komandojn el la radiko de la deponejo Rust
 - **[libs/hbb_common](https://github.com/rustdesk/rustdesk/tree/master/libs/hbb_common)**: videa kodeko, agordado, kovrilo tcp/udp, protobuf, funkcioj fs por dosiertransigo, kaj aliaj utilaĵaj funkcioj
 - **[libs/scrap](https://github.com/rustdesk/rustdesk/tree/master/libs/scrap)**: ekrankaptado
 - **[libs/enigo](https://github.com/rustdesk/rustdesk/tree/master/libs/enigo)**: operaciumspecifa kontrolo de klavaro/muso
-- **[src/ui](https://github.com/rustdesk/rustdesk/tree/master/src/ui)**: interfaco
+- **[flutter](https://github.com/rustdesk/rustdesk/tree/master/flutter)**: Flutter code for desktop and mobile UI
 - **[src/server](https://github.com/rustdesk/rustdesk/tree/master/src/server)**: aŭdio/poŝo/enigo/videa servoj, kaj retkonektoj
 - **[src/client.rs](https://github.com/rustdesk/rustdesk/tree/master/src/client.rs)**: starti konekto kun samtavolo
 - **[src/rendezvous_mediator.rs](https://github.com/rustdesk/rustdesk/tree/master/src/rendezvous_mediator.rs)**: komuniki kun [rustdesk-server](https://github.com/rustdesk/rustdesk-server), atendi foran direktan (TCP hole punching) aŭ relajsatan konekton
@@ -146,3 +140,4 @@ Bonvolu certigi, ke vi plenumas tiujn komandojn el la radiko de la deponejo Rust
 ![image](https://user-images.githubusercontent.com/71636191/113112857-3fbd5d80-923c-11eb-9836-768325faf906.png)
 
 ![image](https://user-images.githubusercontent.com/71636191/135385039-38fdbd72-379a-422d-b97f-33df71fb1cec.png)
+

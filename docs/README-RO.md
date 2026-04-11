@@ -12,7 +12,6 @@
 > **Declinare de responsabilitate privind utilizarea abuzivă:** <br>
 > Dezvoltatorii RustDesk nu susțin sau aprobă utilizarea neetică sau ilegală a acestui software. Utilizarea abuzivă, cum ar fi accesul neautorizat, controlul sau invadarea intimității, este strict împotriva regulilor noastre. Autorii nu sunt responsabili pentru utilizarea necorespunzătoare a aplicației.
 
-
 Conversați cu noi: [Discord](https://discord.gg/nDceKgxnkV) | [Twitter](https://twitter.com/rustdesk) | [Reddit](https://www.reddit.com/r/rustdesk) | [YouTube](https://www.youtube.com/@rustdesk)
 
 [![RustDesk Server Pro](https://img.shields.io/badge/RustDesk%20Server%20Pro-Advanced%20Features-blue)](https://rustdesk.com/pricing.html)
@@ -38,13 +37,7 @@ RustDesk primește contribuții de la oricine. Vezi [CONTRIBUTING.md](../docs/CO
 
 ## Dependențe
 
-Versiunile desktop folosesc Flutter sau Sciter (depreciat) pentru interfață; acest ghid este pentru Sciter doar, deoarece este mai ușor și mai prietenos pentru început. Vezi [CI](https://github.com/rustdesk/rustdesk/blob/master/.github/workflows/flutter-build.yml) pentru construire cu Flutter.
-
-Te rugăm să descarci singur librăria dinamică Sciter.
-
-[Windows](https://raw.githubusercontent.com/c-smile/sciter-sdk/master/bin.win/x64/sciter.dll) |
-[Linux](https://raw.githubusercontent.com/c-smile/sciter-sdk/master/bin.lnx/x64/libsciter-gtk.so) |
-[macOS](https://raw.githubusercontent.com/c-smile/sciter-sdk/master/bin.osx/libsciter.dylib)
+Desktop GUI now uses Flutter only.
 
 ## Pași pentru construire (Raw Steps to build)
 
@@ -120,8 +113,6 @@ source $HOME/.cargo/env
 git clone --recurse-submodules https://github.com/rustdesk/rustdesk
 cd rustdesk
 mkdir -p target/debug
-wget https://raw.githubusercontent.com/c-smile/sciter-sdk/master/bin.lnx/x64/libsciter-gtk.so
-mv libsciter-gtk.so target/debug
 VCPKG_ROOT=$HOME/vcpkg cargo run
 ```
 
@@ -162,7 +153,6 @@ Asigură-te că rulezi aceste comenzi din rădăcina repository-ului RustDesk, a
 - **[libs/scrap](https://github.com/rustdesk/rustdesk/tree/master/libs/scrap)**: capturare ecran
 - **[libs/enigo](https://github.com/rustdesk/rustdesk/tree/master/libs/enigo)**: control tastatură/mouse specific platformei
 - **[libs/clipboard](https://github.com/rustdesk/rustdesk/tree/master/libs/clipboard)**: implementare copy/paste pentru fișiere pentru Windows, Linux, macOS.
-- **[src/ui](https://github.com/rustdesk/rustdesk/tree/master/src/ui)**: interfață Sciter învechită (depreciată)
 - **[src/server](https://github.com/rustdesk/rustdesk/tree/master/src/server)**: servicii audio/clipboard/input/video și conexiuni de rețea
 - **[src/client.rs](https://github.com/rustdesk/rustdesk/tree/master/src/client.rs)**: inițiază o conexiune peer
 - **[src/rendezvous_mediator.rs](https://github.com/rustdesk/rustdesk/tree/master/src/rendezvous_mediator.rs)**: comunică cu [rustdesk-server](https://github.com/rustdesk/rustdesk-server), așteaptă conexiune directă remote (TCP hole punching) sau prin relay
@@ -179,3 +169,4 @@ Asigură-te că rulezi aceste comenzi din rădăcina repository-ului RustDesk, a
 ![File Transfer](https://github.com/rustdesk/rustdesk/assets/28412477/39511ad3-aa9a-4f8c-8947-1cce286a46ad)
 
 ![TCP Tunneling](https://github.com/rustdesk/rustdesk/assets/28412477/78e8708f-e87e-4570-8373-1360033ea6c5)
+

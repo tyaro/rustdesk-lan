@@ -381,7 +381,7 @@ class MyTheme {
     appBarTheme: AppBarTheme(
       shadowColor: Colors.transparent,
     ),
-    dialogTheme: DialogTheme(
+    dialogTheme: DialogThemeData(
       elevation: 15,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(18.0),
@@ -412,7 +412,7 @@ class MyTheme {
     cardColor: grayBg,
     hintColor: Color(0xFFAAAAAA),
     visualDensity: VisualDensity.adaptivePlatformDensity,
-    tabBarTheme: const TabBarTheme(
+    tabBarTheme: const TabBarThemeData(
       labelColor: Colors.black87,
     ),
     tooltipTheme: tooltipTheme(),
@@ -479,7 +479,7 @@ class MyTheme {
     appBarTheme: AppBarTheme(
       shadowColor: Colors.transparent,
     ),
-    dialogTheme: DialogTheme(
+    dialogTheme: DialogThemeData(
       elevation: 15,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(18.0),
@@ -513,7 +513,7 @@ class MyTheme {
     ),
     cardColor: Color(0xFF24252B),
     visualDensity: VisualDensity.adaptivePlatformDensity,
-    tabBarTheme: const TabBarTheme(
+    tabBarTheme: const TabBarThemeData(
       labelColor: Colors.white70,
     ),
     tooltipTheme: tooltipTheme(),
@@ -1571,11 +1571,14 @@ String translate(String name) {
 // sciter: Does not have the function, but it should be kept the same.
 bool option2bool(String option, String value) {
   bool res;
-  if (option.startsWith("enable-")) {
+  if (option == kOptionDirectServer) {
+    res = value != "N";
+  } else if (option == kOptionEnableCheckUpdate) {
+    res = value == "Y";
+  } else if (option.startsWith("enable-")) {
     res = value != "N";
   } else if (option.startsWith("allow-") ||
       option == kOptionStopService ||
-      option == kOptionDirectServer ||
       option == kOptionForceAlwaysRelay) {
     res = value == "Y";
   } else {
@@ -1638,6 +1641,9 @@ Future<bool> matchPeer(
     return true;
   }
   if (peer.id.toLowerCase().contains(searchText)) {
+    return true;
+  }
+  if (peer.ip.toLowerCase().contains(searchText)) {
     return true;
   }
   if (peer.hostname.toLowerCase().contains(searchText) ||

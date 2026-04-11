@@ -94,7 +94,6 @@ class _OnlineStatusWidgetState extends State<OnlineStatusWidget> {
                       ],
                     ),
                   ),
-                )
               ],
             ),
           ),
@@ -294,7 +293,6 @@ class _ConnectionPageState extends State<ConnectionPage>
 
   @override
   Widget build(BuildContext context) {
-    final isOutgoingOnly = bind.isOutgoingOnly();
     return Column(
       children: [
         Expanded(
@@ -310,8 +308,6 @@ class _ConnectionPageState extends State<ConnectionPage>
             Expanded(child: PeerTabPage()),
           ],
         ).paddingOnly(left: 12.0)),
-        if (!isOutgoingOnly) const Divider(height: 1),
-        if (!isOutgoingOnly) OnlineStatusWidget()
       ],
     );
   }

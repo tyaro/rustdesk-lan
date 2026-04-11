@@ -187,6 +187,26 @@ pub fn get_key_state(key: enigo::Key) -> bool {
 impl Client {
     const CLIENT_CLIPBOARD_NAME: &'static str = "client-clipboard";
 
+    #[inline]
+    fn normalize_peer_id(id: &str) -> String {
+        id.chars().filter(|c| !c.is_whitespace()).collect()
+    }
+
+    fn resolve_lan_peer_addr_by_id(peer: &str) -> Option<String> {
+        let target = Self::normalize_peer_id(peer);
+        if target.is_empty() {
+            return None;
+        }
+        for lan_peer in config::LanPeers::load().peers.iter() {
+            if Self::normalize_peer_id(&lan_peer.id) == target {
+                if let Some((ip, _mac)) = lan_peer.ip_mac.iter().next() {
+                    return Some(check_port(ip, RELAY_PORT + 1));
+                }
+            }
+        }
+        None
+    }
+
     /// Start a new connection.
     pub async fn start(
         peer: &str,
@@ -273,6 +293,21 @@ impl Client {
             return Ok((
                 (
                     connect_tcp_local(peer, None, CONNECT_TIMEOUT).await?,
+                    true,
+                    None,
+                    None,
+                    "TCP",
+                ),
+                (0, "".to_owned()),
+                false,
+            ));
+        }
+
+        // LAN-only mode: when an ID matches a discovered LAN peer, connect directly by IP.
+        if let Some(peer_addr) = Self::resolve_lan_peer_addr_by_id(peer) {
+            return Ok((
+                (
+                    connect_tcp_local(peer_addr, None, CONNECT_TIMEOUT).await?,
                     true,
                     None,
                     None,

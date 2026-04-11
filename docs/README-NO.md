@@ -34,13 +34,7 @@ RustDesk er velkommen for bidrag fra alle. Se [CONTRIBUTING.md](CONTRIBUTING-NO.
 
 ## Avhengigheter
 
-Desktop versjoner bruker Flutter eller Sciter (avviklet) for GUI, denne veiledningen er bare for Sciter, grunnet att det er letter og en mer venlig start. Skjekk ut vår [CI](https://github.com/rustdesk/rustdesk/blob/master/.github/workflows/flutter-build.yml) for bygging av Flutter versjonen.
-
-Venligst last ned Sciters dynamiske bibliotek selv.
-
-[Windows](https://raw.githubusercontent.com/c-smile/sciter-sdk/master/bin.win/x64/sciter.dll) |
-[Linux](https://raw.githubusercontent.com/c-smile/sciter-sdk/master/bin.lnx/x64/libsciter-gtk.so) |
-[macOS](https://raw.githubusercontent.com/c-smile/sciter-sdk/master/bin.osx/libsciter.dylib)
+Desktop GUI now uses Flutter only.
 
 ## Rå steg for bygging
 
@@ -116,8 +110,6 @@ source $HOME/.cargo/env
 git clone https://github.com/rustdesk/rustdesk
 cd rustdesk
 mkdir -p target/debug
-wget https://raw.githubusercontent.com/c-smile/sciter-sdk/master/bin.lnx/x64/libsciter-gtk.so
-mv libsciter-gtk.so target/debug
 VCPKG_ROOT=$HOME/vcpkg cargo run
 ```
 
@@ -157,7 +149,6 @@ Venligst pass på att du kjører disse kommandoene fra roten av RustDesk reposit
 - **[libs/scrap](https://github.com/rustdesk/rustdesk/tree/master/libs/scrap)**: skjermfangst
 - **[libs/enigo](https://github.com/rustdesk/rustdesk/tree/master/libs/enigo)**: platform spesefik keyboard/mus kontroll
 - **[libs/clipboard](https://github.com/rustdesk/rustdesk/tree/master/libs/clipboard)**: fil kopi og innliming implementasjon for Windows, Linux, macOS.
-- **[src/ui](https://github.com/rustdesk/rustdesk/tree/master/src/ui)**: foreldret Sciter UI (avviklet)
 - **[src/server](https://github.com/rustdesk/rustdesk/tree/master/src/server)**: lyd/utklippstavle/input/video tjenester, og internett tilkobling
 - **[src/client.rs](https://github.com/rustdesk/rustdesk/tree/master/src/client.rs)**: start en peer tilkobling
 - **[src/rendezvous_mediator.rs](https://github.com/rustdesk/rustdesk/tree/master/src/rendezvous_mediator.rs)**: Kommunikasjon med [rustdesk-server](https://github.com/rustdesk/rustdesk-server), vent på direkte fjernstyring (TCP hulling) eller vidresendt tilkobling
@@ -174,4 +165,5 @@ Venligst pass på att du kjører disse kommandoene fra roten av RustDesk reposit
 ![Fil Overføring](https://github.com/rustdesk/rustdesk/assets/28412477/39511ad3-aa9a-4f8c-8947-1cce286a46ad)
 
 ![TCP Tunneling](https://github.com/rustdesk/rustdesk/assets/28412477/78e8708f-e87e-4570-8373-1360033ea6c5)
+
 

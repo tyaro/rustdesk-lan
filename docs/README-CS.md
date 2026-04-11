@@ -11,7 +11,6 @@
 
 Popovídejte si s námi: [Discord](https://discord.gg/nDceKgxnkV) | [Twitter](https://twitter.com/rustdesk) | [Reddit](https://www.reddit.com/r/rustdesk) | [YouTube](https://www.youtube.com/@rustdesk)
 
-
 [![RustDesk Server Pro](https://img.shields.io/badge/RustDesk%20Server%20Pro-Pokro%C4%8Dil%C3%A9%20Funkce-blue)](https://rustdesk.com/pricing.html)
 
 Zase další software pro přístup k ploše na dálku, naprogramovaný v jazyce Rust. Funguje hned tak, jak je – není třeba žádného nastavování. Svá data máte ve svých rukách, bez obav o zabezpečení. Je možné používat námi poskytovaný propojovací/předávací (relay) server, [vytvořit si svůj vlastní](https://rustdesk.com/server), nebo [si dokonce svůj vlastní naprogramovat](https://github.com/rustdesk/rustdesk-server-demo), budete-li chtít.
@@ -24,11 +23,7 @@ Projekt RustDesk vítá přiložení ruky k dílu od každého. Jak začít se d
 
 ## Softwarové součásti, na kterých závisí
 
-Varianta pro počítač používá pro grafické uživatelské rozhraní [sciter](https://sciter.com/) – stáhněte si potřebnou knihovnu.
-
-[Windows](https://raw.githubusercontent.com/c-smile/sciter-sdk/master/bin.win/x64/sciter.dll) |
-[Linux](https://raw.githubusercontent.com/c-smile/sciter-sdk/master/bin.lnx/x64/libsciter-gtk.so) |
-[MacOS](https://raw.githubusercontent.com/c-smile/sciter-sdk/master/bin.osx/libsciter.dylib)
+Desktop GUI now uses Flutter only.
 
 Varianta pro mobilní platformy používá aplikační rámec (framework) Flutter. Na tu také v budoucnu předěláme i variantu pro počítač.
 
@@ -98,8 +93,6 @@ source $HOME/.cargo/env
 git clone https://github.com/rustdesk/rustdesk
 cd rustdesk
 mkdir -p target/debug
-wget https://raw.githubusercontent.com/c-smile/sciter-sdk/master/bin.lnx/x64/libsciter-gtk.so
-mv libsciter-gtk.so target/debug
 VCPKG_ROOT=$HOME/vcpkg cargo run
 ```
 
@@ -138,7 +131,6 @@ Ujistěte se, že tyto příkazy spouštíte z kořenového adresáře RustDesk,
 - **[libs/hbb_common](https://github.com/rustdesk/rustdesk/tree/master/libs/hbb_common)**: kodek videa, nastavení, obalovaní tcp/udp, vyrovnávací paměť protokolu, funkce souborového systému pro přenos souborů a pár dalších podpůrných funkcí
 - **[libs/scrap](https://github.com/rustdesk/rustdesk/tree/master/libs/scrap)**: zachytávání obsahu obrazovky
 - **[libs/enigo](https://github.com/rustdesk/rustdesk/tree/master/libs/enigo)**: ovládání klávesnice/myši pro jednotlivé platformy
-- **[src/ui](https://github.com/rustdesk/rustdesk/tree/master/src/ui)**: grafické uživatelské rozhraní
 - **[src/server](https://github.com/rustdesk/rustdesk/tree/master/src/server)**: služby pro zvuk/schránku/zadávání/video a síťová spojení
 - **[src/client.rs](https://github.com/rustdesk/rustdesk/tree/master/src/client.rs)**: spouští připojení k protějšku
 - **[src/rendezvous_mediator.rs](https://github.com/rustdesk/rustdesk/tree/master/src/rendezvous_mediator.rs)**: komunikace s [rustdesk-server](https://github.com/rustdesk/rustdesk-server), očekávání vzdálených příméhých („proděrováváním“ TCP) nebo předávaných (relay) spojení
@@ -155,3 +147,4 @@ Ujistěte se, že tyto příkazy spouštíte z kořenového adresáře RustDesk,
 ![image](https://user-images.githubusercontent.com/71636191/113112857-3fbd5d80-923c-11eb-9836-768325faf906.png)
 
 ![image](https://user-images.githubusercontent.com/71636191/135385039-38fdbd72-379a-422d-b97f-33df71fb1cec.png)
+

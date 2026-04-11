@@ -7,6 +7,7 @@ import 'package:collection/collection.dart';
 
 class Peer {
   final String id;
+  final String ip;
   String hash; // personal ab hash password
   String password; // shared ab password
   String username; // pc username
@@ -32,6 +33,7 @@ class Peer {
 
   Peer.fromJson(Map<String, dynamic> json)
       : id = json['id'] ?? '',
+        ip = json['ip'] ?? '',
         hash = json['hash'] ?? '',
         password = json['password'] ?? '',
         username = json['username'] ?? '',
@@ -50,6 +52,7 @@ class Peer {
   Map<String, dynamic> toJson() {
     return <String, dynamic>{
       "id": id,
+      "ip": ip,
       "hash": hash,
       "password": password,
       "username": username,
@@ -95,6 +98,7 @@ class Peer {
 
   Peer({
     required this.id,
+    this.ip = '',
     required this.hash,
     required this.password,
     required this.username,
@@ -130,6 +134,7 @@ class Peer {
         );
   bool equal(Peer other) {
     return id == other.id &&
+      ip == other.ip &&
         hash == other.hash &&
         password == other.password &&
         username == other.username &&
@@ -148,6 +153,7 @@ class Peer {
   Peer.copy(Peer other)
       : this(
             id: other.id,
+        ip: other.ip,
             hash: other.hash,
             password: other.password,
             username: other.username,
