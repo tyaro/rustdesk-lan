@@ -25,6 +25,9 @@ on:
       - "flatpak/**"
 
 jobs:
+  generate-bridge:
+    uses: ./.github/workflows/bridge.yml
+
   # ensure_cargo_fmt:
   #   name: Ensure 'cargo fmt' has been run
   #   runs-on: ubuntu-20.04
@@ -67,6 +70,7 @@ jobs:
 
   build:
     name: ${{ matrix.job.target }} (${{ matrix.job.os }})
+    needs: [generate-bridge]
     runs-on: ${{ matrix.job.os }}
     strategy:
       fail-fast: false
@@ -109,6 +113,12 @@ jobs:
       uses: actions/checkout@v4
       with:
         submodules: recursive
+
+    - name: Restore bridge files
+      uses: actions/download-artifact@master
+      with:
+        name: bridge-artifact
+        path: ./
 
     - name: Install prerequisites
       shell: bash
