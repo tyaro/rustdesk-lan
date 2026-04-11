@@ -16,23 +16,6 @@ fn main() {
     common::global_clean();
 }
 
-#[cfg(not(any(
-    target_os = "android",
-    target_os = "ios",
-    feature = "cli",
-    feature = "flutter"
-)))]
-fn main() {
-    #[cfg(all(windows, not(feature = "inline")))]
-    unsafe {
-        winapi::um::shellscalingapi::SetProcessDpiAwareness(2);
-    }
-    if let Some(args) = crate::core_main::core_main().as_mut() {
-        ui::start(args);
-    }
-    common::global_clean();
-}
-
 #[cfg(feature = "cli")]
 fn main() {
     if !common::global_init() {
