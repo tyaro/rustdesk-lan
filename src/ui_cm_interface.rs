@@ -965,7 +965,7 @@ async fn handle_fs(
 
             // cm has no show_hidden context
             // dummy remote, show_hidden, is_remote
-            let mut job = fs::TransferJob::new_write(
+            let mut job = match fs::TransferJob::new_write(
                 id,
                 fs::JobType::Generic,
                 "".to_string(),
@@ -973,9 +973,16 @@ async fn handle_fs(
                 file_num,
                 false,
                 false,
-                file_entries,
                 overwrite_detection,
-            );
+            )
+            .with_files(file_entries)
+            {
+                Ok(job) => job,
+                Err(e) => {
+                    send_raw(fs::new_error(id, e, file_num), tx);
+                    return;
+                }
+            };
             job.total_size = total_size;
             job.conn_id = conn_id;
             write_jobs.push(job);
