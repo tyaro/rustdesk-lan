@@ -728,18 +728,11 @@ async fn test_rendezvous_server_() {
 
 // #[cfg(any(target_os = "android", target_os = "ios", feature = "cli"))]
 pub fn test_rendezvous_server() {
-    std::thread::spawn(test_rendezvous_server_);
+    // LAN-only mode: disable hbbs probe.
 }
 
 pub fn refresh_rendezvous_server() {
-    #[cfg(any(target_os = "android", target_os = "ios", feature = "cli"))]
-    test_rendezvous_server();
-    #[cfg(not(any(target_os = "android", target_os = "ios", feature = "cli")))]
-    std::thread::spawn(|| {
-        if crate::ipc::test_rendezvous_server().is_err() {
-            test_rendezvous_server();
-        }
-    });
+    // LAN-only mode: disable hbbs refresh.
 }
 
 pub fn run_me<T: AsRef<std::ffi::OsStr>>(args: Vec<T>) -> std::io::Result<std::process::Child> {

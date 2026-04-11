@@ -2245,7 +2245,6 @@ bool handleUriLink({List<String>? cmdArgs, Uri? uri, String? uriString}) {
   String? id;
   String? password;
   String? switchUuid;
-  bool? forceRelay;
   for (int i = 0; i < args.length; i++) {
     switch (args[i]) {
       case '--connect':
@@ -2293,9 +2292,6 @@ bool handleUriLink({List<String>? cmdArgs, Uri? uri, String? uriString}) {
         switchUuid = args[i + 1];
         i++;
         break;
-      case '--relay':
-        forceRelay = true;
-        break;
       default:
         break;
     }
@@ -2306,38 +2302,32 @@ bool handleUriLink({List<String>? cmdArgs, Uri? uri, String? uriString}) {
         Future.delayed(Duration.zero, () {
           rustDeskWinManager.newRemoteDesktop(id!,
               password: password,
-              switchUuid: switchUuid,
-              forceRelay: forceRelay);
+              switchUuid: switchUuid);
         });
         break;
       case UriLinkType.fileTransfer:
         Future.delayed(Duration.zero, () {
-          rustDeskWinManager.newFileTransfer(id!,
-              password: password, forceRelay: forceRelay);
+          rustDeskWinManager.newFileTransfer(id!, password: password);
         });
         break;
       case UriLinkType.viewCamera:
         Future.delayed(Duration.zero, () {
-          rustDeskWinManager.newViewCamera(id!,
-              password: password, forceRelay: forceRelay);
+          rustDeskWinManager.newViewCamera(id!, password: password);
         });
         break;
       case UriLinkType.portForward:
         Future.delayed(Duration.zero, () {
-          rustDeskWinManager.newPortForward(id!, false,
-              password: password, forceRelay: forceRelay);
+          rustDeskWinManager.newPortForward(id!, false, password: password);
         });
         break;
       case UriLinkType.rdp:
         Future.delayed(Duration.zero, () {
-          rustDeskWinManager.newPortForward(id!, true,
-              password: password, forceRelay: forceRelay);
+          rustDeskWinManager.newPortForward(id!, true, password: password);
         });
         break;
       case UriLinkType.terminal:
         Future.delayed(Duration.zero, () {
-          rustDeskWinManager.newTerminal(id!,
-              password: password, forceRelay: forceRelay);
+          rustDeskWinManager.newTerminal(id!, password: password);
         });
         break;
     }

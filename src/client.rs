@@ -318,11 +318,15 @@ impl Client {
             ));
         }
 
-        let other_server = interface.get_lch().read().unwrap().other_server.clone();
-        // LAN-only mode: reject ID-based connections when no rendezvous server is configured.
-        if other_server.is_none() && config::Config::get_rendezvous_servers().is_empty() {
-            bail!("LAN only mode: please enter the remote host IP address directly (e.g. 192.168.1.100)");
+        // LAN-only mode: disable hbbs/hbbr (rendezvous/relay) path by default.
+        // Connection is allowed only by direct address or discovered LAN peer mapping above.
+        // For temporary debugging, this can be overridden with:
+        // RUSTDESK_ENABLE_HBBS_HBBR=Y
+        if std::env::var("RUSTDESK_ENABLE_HBBS_HBBR").unwrap_or_default() != "Y" {
+            bail!("LAN only mode: hbbs/hbbr is disabled. Please connect by remote host IP address directly (e.g. 192.168.1.100)");
         }
+
+        let other_server = interface.get_lch().read().unwrap().other_server.clone();
         let (peer, other_server, key, token) = if let Some((a, b, c)) = other_server.as_ref() {
             (a.as_ref(), b.as_ref(), c.as_ref(), "")
         } else {
@@ -3994,29 +3998,14 @@ pub mod peer_online {
         config::{Config, CONNECT_TIMEOUT, READ_TIMEOUT},
         log,
         rendezvous_proto::*,
-        sleep,
         socket_client::connect_tcp,
         ResultType, Stream,
     };
 
     pub async fn query_online_states<F: FnOnce(Vec<String>, Vec<String>)>(ids: Vec<String>, f: F) {
-        let test = false;
-        if test {
-            sleep(1.5).await;
-            let mut onlines = ids;
-            let offlines = onlines.drain((onlines.len() / 2)..).collect();
-            f(onlines, offlines)
-        } else {
-            let query_timeout = std::time::Duration::from_millis(3_000);
-            match query_online_states_(&ids, query_timeout).await {
-                Ok((onlines, offlines)) => {
-                    f(onlines, offlines);
-                }
-                Err(e) => {
-                    log::debug!("query onlines, {}", &e);
-                }
-            }
-        }
+        // LAN-only mode: online-state query via hbbs is disabled.
+        // Treat all IDs as "unknown/offline" from server perspective.
+        f(vec![], ids)
     }
 
     async fn create_online_stream() -> ResultType<Stream> {

@@ -41,7 +41,7 @@ class PeerTabModel with ChangeNotifier {
     true,
     true,
     !isWeb && bind.mainGetLocalOption(key: "disable-discovery-panel") != "Y",
-    !(bind.isDisableAb() || bind.isDisableAccount()),
+    false, // LAN-only mode: hide address book/login tab
     false, // LAN-only mode: hide login/access devices tab
   ]);
   final List<bool> _isVisible = List.filled(maxTabCount, true, growable: false);
