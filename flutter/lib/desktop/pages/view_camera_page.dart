@@ -612,12 +612,14 @@ class _ImagePaintState extends State<ImagePaint> {
     );
   }
 
+  // ignore: unused_element
   MouseCursor _buildCustomCursor(BuildContext context, double scale) {
     final cursor = Provider.of<CursorModel>(context);
     final cache = cursor.cache ?? preDefaultCursor.cache;
     return buildCursorOfCache(cursor, scale, cache);
   }
 
+  // ignore: unused_element
   MouseCursor _buildDisabledCursor(BuildContext context, double scale) {
     final cursor = Provider.of<CursorModel>(context);
     final cache = preForbiddenCursor.cache;

@@ -29,6 +29,7 @@ const double _kMenuVerticalPadding = 8.0;
 const double _kMenuWidthStep = 0.0;
 //const double _kMenuScreenPadding = 8.0;
 const double _kMenuScreenPadding = 0.0;
+// ignore: unused_element
 const double _kDefaultIconSize = 24.0;
 
 /// Used to configure how the [PopupMenuButton] positions its popup menu.

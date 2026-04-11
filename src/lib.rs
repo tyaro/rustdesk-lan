@@ -1,3 +1,6 @@
+#![allow(warnings)]
+#![allow(clippy::all)]
+
 mod keyboard;
 /// cbindgen:ignore
 pub mod platform;

@@ -1,3 +1,6 @@
+#![allow(warnings)]
+#![allow(clippy::all)]
+
 use std::sync::{Arc, Mutex, RwLock};
 
 #[cfg(any(

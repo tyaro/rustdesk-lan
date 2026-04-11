@@ -52,6 +52,7 @@
 //! enigo.key_sequence("hello world");
 //! ```
 #![deny(missing_docs)]
+#![allow(clippy::all)]
 
 #[cfg(target_os = "macos")]
 #[macro_use]

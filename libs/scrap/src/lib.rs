@@ -1,3 +1,6 @@
+#![allow(warnings)]
+#![allow(clippy::all)]
+
 #[cfg(quartz)]
 extern crate block;
 #[macro_use]

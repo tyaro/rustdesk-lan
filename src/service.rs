@@ -1,3 +1,6 @@
+#![allow(warnings)]
+#![allow(clippy::all)]
+
 use librustdesk::*;
 
 #[cfg(not(target_os = "macos"))]

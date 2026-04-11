@@ -106,8 +106,7 @@ impl CapturerGDI {
 
             let stride = self.width * PIXEL_WIDTH;
             let size: usize = (stride * self.height) as usize;
-            let mut data1: Vec<u8> = Vec::with_capacity(size);
-            data1.set_len(size);
+            let mut data1 = vec![0u8; size];
             data.resize(size, 0);
 
             let mut bmi = BITMAPINFO {

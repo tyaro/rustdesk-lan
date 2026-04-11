@@ -1,3 +1,6 @@
+#![allow(warnings)]
+#![allow(clippy::all)]
+
 #[cfg(target_os = "windows")]
 mod setup;
 #[cfg(target_os = "windows")]

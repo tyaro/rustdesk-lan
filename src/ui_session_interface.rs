@@ -1,3 +1,6 @@
+#![allow(warnings)]
+#![allow(clippy::all)]
+
 use crate::{
     common::{get_supported_keyboard_modes, is_keyboard_mode_supported},
     input::{

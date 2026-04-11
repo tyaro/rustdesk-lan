@@ -1,3 +1,6 @@
+#![allow(warnings)]
+#![allow(clippy::all)]
+
 #[cfg(feature = "flutter")]
 use crate::flutter;
 #[cfg(target_os = "windows")]

@@ -928,6 +928,7 @@ pub mod client {
         }
     }
 
+    #[allow(clippy::not_unsafe_ptr_arg_deref)]
     pub fn get_cursor_info(pci: PCURSORINFO) -> BOOL {
         if RUNNING.lock().unwrap().clone() {
             let mut option = SHMEM.lock().unwrap();
