@@ -2852,14 +2852,17 @@ bool get isWin10 => windowsBuildNumber.windowsVersion == WindowsTarget.w10;
 
 class ServerConfig {
   late String idServer;
-  late String relayServer;
+  // LAN-only mode: relayServer is disabled
+  // late String relayServer;
+  late String relayServer; // Kept for backward compatibility with config encoding
   late String apiServer;
   late String key;
 
   ServerConfig(
       {String? idServer, String? relayServer, String? apiServer, String? key}) {
     this.idServer = idServer?.trim() ?? '';
-    this.relayServer = relayServer?.trim() ?? '';
+    // LAN-only mode: relayServer is always empty
+    this.relayServer = ''; // relayServer?.trim() ?? ''  - force empty for LAN-only
     this.apiServer = apiServer?.trim() ?? '';
     this.key = key?.trim() ?? '';
   }
@@ -2900,7 +2903,7 @@ class ServerConfig {
   /// from local options
   ServerConfig.fromOptions(Map<String, dynamic> options)
       : idServer = options['custom-rendezvous-server'] ?? "",
-        relayServer = options['relay-server'] ?? "",
+        relayServer = "", // LAN-only mode: relayServer always empty, was: options['relay-server'] ?? ""
         apiServer = options['api-server'] ?? "",
         key = options['key'] ?? "";
 }
@@ -3526,14 +3529,14 @@ Future<bool> setServerConfig(
       return false;
     }
   }
-  // relay
-  if (config.relayServer.isNotEmpty && errMsgs != null) {
-    errMsgs[1].value = translate(await bind.mainTestIfValidServer(
-        server: config.relayServer, testWithProxy: true));
-    if (errMsgs[1].isNotEmpty) {
-      return false;
-    }
-  }
+  // relay - LAN-only mode: relay server check is disabled
+  // if (config.relayServer.isNotEmpty && errMsgs != null) {
+  //   errMsgs[1].value = translate(await bind.mainTestIfValidServer(
+  //       server: config.relayServer, testWithProxy: true));
+  //   if (errMsgs[1].isNotEmpty) {
+  //     return false;
+  //   }
+  // }
   // api
   if (config.apiServer.isNotEmpty && errMsgs != null) {
     if (!config.apiServer.startsWith('http://') &&
@@ -3548,7 +3551,9 @@ Future<bool> setServerConfig(
   // should set one by one
   await bind.mainSetOption(
       key: 'custom-rendezvous-server', value: config.idServer);
-  await bind.mainSetOption(key: 'relay-server', value: config.relayServer);
+  // LAN-only mode: relay-server is always empty
+  await bind.mainSetOption(key: 'relay-server', value: '');
+  // await bind.mainSetOption(key: 'relay-server', value: config.relayServer);
   await bind.mainSetOption(key: 'api-server', value: config.apiServer);
   await bind.mainSetOption(key: 'key', value: config.key);
   final newApiServer = await bind.mainGetApiServer();

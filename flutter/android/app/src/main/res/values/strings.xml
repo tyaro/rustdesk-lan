@@ -1,4 +1,5 @@
 <resources>
-    <string name="app_name">RustDesk</string>
-    <string name="accessibility_service_description">Allow other devices to control your phone using virtual touch, when RustDesk screen sharing is established</string>
+    <string name="app_name">RustDesk LAN</string>
+    <string name="app_input_label">RustDesk LAN Input</string>
+    <string name="accessibility_service_description">Allow other devices to control your phone using virtual touch, when RustDesk LAN screen sharing is established</string>
 </resources>

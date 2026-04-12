@@ -145,7 +145,7 @@ void showServerSettingsWithValue(
     return CustomAlertDialog(
       title: Row(
         children: [
-          Expanded(child: Text(translate('ID/Relay Server'))),
+          Expanded(child: Text(translate('ID Server'))), // LAN-only mode
           ...ServerConfigImportExportWidgets(controllers, errMsgs),
         ],
       ),
@@ -158,11 +158,12 @@ void showServerSettingsWithValue(
                   buildField(translate('ID Server'), idCtrl, idServerMsg.value,
                       autofocus: true),
                   SizedBox(height: 8),
-                  if (!isIOS && !isWeb) ...[
-                    buildField(translate('Relay Server'), relayCtrl,
-                        relayServerMsg.value),
-                    SizedBox(height: 8),
-                  ],
+                  // LAN-only mode: Relay Server is disabled
+                  // if (!isIOS && !isWeb) ...[
+                  //   buildField(translate('Relay Server'), relayCtrl,
+                  //       relayServerMsg.value),
+                  //   SizedBox(height: 8),
+                  // ],
                   buildField(
                     translate('API Server'),
                     apiCtrl,
