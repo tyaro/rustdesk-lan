@@ -11,7 +11,8 @@ on:
         default: "nightly"
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  # Reusable workflow must use a distinct group from caller workflow to avoid deadlock.
+  group: flutter-build-${{ github.ref }}
   cancel-in-progress: true
 
 # NOTE: F-Droid builder script 'flutter/build_fdroid.sh' reads environment
@@ -659,7 +660,6 @@ jobs:
           files: rustdesk-${{ env.VERSION }}-unsigned.tar.gz
 
   build-rustdesk-android:
-    if: false # LAN運用向け: Androidパイプラインは無効化
     needs: [generate-bridge]
     name: build rustdesk android apk ${{ matrix.job.target }}
     runs-on: ${{ matrix.job.os }}
