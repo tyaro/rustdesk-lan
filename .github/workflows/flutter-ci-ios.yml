@@ -1,4 +1,4 @@
-name: Full Flutter CI
+name: CI - iOS Build
 
 on:
   workflow_dispatch:
@@ -17,7 +17,7 @@ jobs:
     with:
       upload-artifact: true
       upload-tag: "nightly"
-      build-windows: true
-      build-android: true
+      build-windows: false
+      build-android: false
       build-ios: true
-      concurrency-suffix: "all"
+      concurrency-suffix: "ios"

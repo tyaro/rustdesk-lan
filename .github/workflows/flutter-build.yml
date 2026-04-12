@@ -9,10 +9,22 @@ on:
       upload-tag:
         type: string
         default: "nightly"
+      build-windows:
+        type: boolean
+        default: true
+      build-android:
+        type: boolean
+        default: true
+      build-ios:
+        type: boolean
+        default: true
+      concurrency-suffix:
+        type: string
+        default: "all"
 
 concurrency:
   # Reusable workflow must use a distinct group from caller workflow to avoid deadlock.
-  group: flutter-build-${{ github.ref }}
+  group: flutter-build-${{ inputs.concurrency-suffix }}-${{ github.ref }}
   cancel-in-progress: true
 
 # NOTE: F-Droid builder script 'flutter/build_fdroid.sh' reads environment
@@ -55,6 +67,7 @@ jobs:
     uses: ./.github/workflows/bridge.yml
 
   build-RustDeskTempTopMostWindow:
+    if: ${{ inputs.build-windows }}
     uses: ./.github/workflows/third-party-RustDeskTempTopMostWindow.yml
     with:
       upload-artifact: ${{ inputs.upload-artifact }}
@@ -290,6 +303,7 @@ jobs:
             ./SignOutput/rustdesk-*.exe
 
   build-rustdesk-ios:
+    if: ${{ inputs.build-ios }}
     name: build rustdesk ios ipa
     runs-on: ${{ matrix.job.os }}
     needs: [generate-bridge]
@@ -668,6 +682,7 @@ jobs:
           files: rustdesk-${{ env.VERSION }}-unsigned.tar.gz
 
   build-rustdesk-android:
+    if: ${{ inputs.build-android }}
     needs: [generate-bridge]
     name: build rustdesk android apk ${{ matrix.job.target }}
     runs-on: ${{ matrix.job.os }}
