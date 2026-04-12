@@ -1,21 +1,21 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:flutter_hbb/common/widgets/dialog.dart';
-import 'package:flutter_hbb/desktop/widgets/dragable_divider.dart';
+import 'package:rustdesk_lan/common/widgets/dialog.dart';
+import 'package:rustdesk_lan/desktop/widgets/dragable_divider.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_breadcrumb/flutter_breadcrumb.dart';
-import 'package:flutter_hbb/desktop/widgets/list_search_action_listener.dart';
-import 'package:flutter_hbb/desktop/widgets/menu_button.dart';
-import 'package:flutter_hbb/desktop/widgets/tabbar_widget.dart';
-import 'package:flutter_hbb/models/file_model.dart';
+import 'package:rustdesk_lan/desktop/widgets/list_search_action_listener.dart';
+import 'package:rustdesk_lan/desktop/widgets/menu_button.dart';
+import 'package:rustdesk_lan/desktop/widgets/tabbar_widget.dart';
+import 'package:rustdesk_lan/models/file_model.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
-import 'package:flutter_hbb/web/dummy.dart'
-    if (dart.library.html) 'package:flutter_hbb/web/web_unique.dart';
+import 'package:rustdesk_lan/web/dummy.dart'
+    if (dart.library.html) 'package:rustdesk_lan/web/web_unique.dart';
 
 import '../../consts.dart';
 import '../../desktop/widgets/material_mod_popup_menu.dart' as mod_menu;

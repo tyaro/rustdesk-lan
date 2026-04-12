@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/gestures.dart';
 
-import 'package:flutter_hbb/models/platform_model.dart';
-import 'package:flutter_hbb/common.dart';
-import 'package:flutter_hbb/consts.dart';
-import 'package:flutter_hbb/models/model.dart';
-import 'package:flutter_hbb/models/input_model.dart';
+import 'package:rustdesk_lan/models/platform_model.dart';
+import 'package:rustdesk_lan/common.dart';
+import 'package:rustdesk_lan/consts.dart';
+import 'package:rustdesk_lan/models/model.dart';
+import 'package:rustdesk_lan/models/input_model.dart';
 
 import './gestures.dart';
 

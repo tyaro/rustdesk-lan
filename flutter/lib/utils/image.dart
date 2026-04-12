@@ -3,7 +3,7 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/widgets.dart';
 
-import 'package:flutter_hbb/common.dart';
+import 'package:rustdesk_lan/common.dart';
 
 Future<ui.Image?> decodeImageFromPixels(
   Uint8List pixels,

@@ -4,10 +4,10 @@ import 'package:desktop_multi_window/desktop_multi_window.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_hbb/consts.dart';
-import 'package:flutter_hbb/common.dart';
-import 'package:flutter_hbb/main.dart';
-import 'package:flutter_hbb/models/input_model.dart';
+import 'package:rustdesk_lan/consts.dart';
+import 'package:rustdesk_lan/common.dart';
+import 'package:rustdesk_lan/main.dart';
+import 'package:rustdesk_lan/models/input_model.dart';
 
 /// must keep the order
 // ignore: constant_identifier_names

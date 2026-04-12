@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_hbb/common.dart';
+import 'package:rustdesk_lan/common.dart';
 
 void showPeerSelectionDialog(
     {bool singleSelection = false,

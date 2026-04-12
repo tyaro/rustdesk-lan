@@ -63,6 +63,16 @@ endfunction()
 set(FLUTTER_MANAGED_DIR "${CMAKE_CURRENT_SOURCE_DIR}/flutter")
 add_subdirectory(${FLUTTER_MANAGED_DIR})
 
+# Build the Rust bridge library so `flutter build windows` can run without
+# requiring the outer Python build wrapper first.
+set(RUSTDESK_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../..")
+add_custom_target(build_rustdesk_lib ALL
+  COMMAND cargo build --features flutter --lib $<$<NOT:$<CONFIG:Debug>>:--release>
+  WORKING_DIRECTORY "${RUSTDESK_ROOT_DIR}"
+  COMMENT "Building RustDesk Flutter bridge library"
+  VERBATIM
+)
+
 # Application build; see runner/CMakeLists.txt.
 add_subdirectory("runner")
 
@@ -106,6 +116,9 @@ message(STATUS "rustdesk lib build type: ${RUSTDESK_LIB_BUILD_TYPE}")
 set(RUSTDESK_LIB "../../target/${RUSTDESK_LIB_BUILD_TYPE}/librustdesk.dll")
 install(FILES "${RUSTDESK_LIB}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
 COMPONENT Runtime RENAME librustdesk.dll)
+set(RUSTDESK_VIRTUAL_DISPLAY_LIB "../../target/${RUSTDESK_LIB_BUILD_TYPE}/deps/dylib_virtual_display.dll")
+install(FILES "${RUSTDESK_VIRTUAL_DISPLAY_LIB}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
+  COMPONENT Runtime OPTIONAL)
 
 # Fully re-copy the assets directory on each build to avoid having stale files
 # from a previous install.

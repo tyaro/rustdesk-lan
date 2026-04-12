@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_hbb/desktop/pages/desktop_home_page.dart';
-import 'package:flutter_hbb/mobile/widgets/dialog.dart';
-import 'package:flutter_hbb/models/chat_model.dart';
+import 'package:rustdesk_lan/desktop/pages/desktop_home_page.dart';
+import 'package:rustdesk_lan/mobile/widgets/dialog.dart';
+import 'package:rustdesk_lan/models/chat_model.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 

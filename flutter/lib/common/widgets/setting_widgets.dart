@@ -1,9 +1,9 @@
 import 'package:debounce_throttle/debounce_throttle.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_hbb/common.dart';
-import 'package:flutter_hbb/consts.dart';
-import 'package:flutter_hbb/models/platform_model.dart';
+import 'package:rustdesk_lan/common.dart';
+import 'package:rustdesk_lan/consts.dart';
+import 'package:rustdesk_lan/models/platform_model.dart';
 import 'package:get/get.dart';
 
 customImageQualityWidget(

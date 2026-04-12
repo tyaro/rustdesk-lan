@@ -1,4 +1,4 @@
-import 'package:flutter_hbb/common.dart';
+import 'package:rustdesk_lan/common.dart';
 import 'package:get/get.dart';
 
 import '../consts.dart';

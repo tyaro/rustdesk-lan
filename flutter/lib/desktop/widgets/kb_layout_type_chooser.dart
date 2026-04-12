@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:flutter_hbb/consts.dart';
+import 'package:rustdesk_lan/consts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_hbb/models/platform_model.dart';
+import 'package:rustdesk_lan/models/platform_model.dart';
 
 import '../../common.dart';
 

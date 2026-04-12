@@ -1,10 +1,10 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter_hbb/common.dart';
-import 'package:flutter_hbb/common/hbbs/hbbs.dart';
-import 'package:flutter_hbb/common/widgets/peers_view.dart';
-import 'package:flutter_hbb/models/model.dart';
-import 'package:flutter_hbb/models/peer_model.dart';
-import 'package:flutter_hbb/models/platform_model.dart';
+import 'package:rustdesk_lan/common.dart';
+import 'package:rustdesk_lan/common/hbbs/hbbs.dart';
+import 'package:rustdesk_lan/common/widgets/peers_view.dart';
+import 'package:rustdesk_lan/models/model.dart';
+import 'package:rustdesk_lan/models/peer_model.dart';
+import 'package:rustdesk_lan/models/platform_model.dart';
 import 'package:get/get.dart';
 import 'dart:convert';
 import '../utils/http_service.dart' as http;

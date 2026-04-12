@@ -5,13 +5,13 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_hbb/common/widgets/connection_page_title.dart';
-import 'package:flutter_hbb/consts.dart';
-import 'package:flutter_hbb/desktop/widgets/popup_menu.dart';
-import 'package:flutter_hbb/models/state_model.dart';
+import 'package:rustdesk_lan/common/widgets/connection_page_title.dart';
+import 'package:rustdesk_lan/consts.dart';
+import 'package:rustdesk_lan/desktop/widgets/popup_menu.dart';
+import 'package:rustdesk_lan/models/state_model.dart';
 import 'package:get/get.dart';
 import 'package:window_manager/window_manager.dart';
-import 'package:flutter_hbb/models/peer_model.dart';
+import 'package:rustdesk_lan/models/peer_model.dart';
 
 import '../../common.dart';
 import '../../common/formatter/id_formatter.dart';

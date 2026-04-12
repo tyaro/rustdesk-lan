@@ -1,10 +1,10 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_hbb/common/widgets/dialog.dart';
-import 'package:flutter_hbb/consts.dart';
-import 'package:flutter_hbb/models/peer_tab_model.dart';
-import 'package:flutter_hbb/models/state_model.dart';
+import 'package:rustdesk_lan/common/widgets/dialog.dart';
+import 'package:rustdesk_lan/consts.dart';
+import 'package:rustdesk_lan/models/peer_tab_model.dart';
+import 'package:rustdesk_lan/models/state_model.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 

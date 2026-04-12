@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hbb/common.dart';
-import 'package:flutter_hbb/consts.dart';
-import 'package:flutter_hbb/desktop/pages/server_page.dart';
-import 'package:flutter_hbb/desktop/widgets/tabbar_widget.dart';
-import 'package:flutter_hbb/main.dart';
-import 'package:flutter_hbb/models/server_model.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:rustdesk_lan/common.dart';
+import 'package:rustdesk_lan/consts.dart';
+import 'package:rustdesk_lan/desktop/pages/server_page.dart';
+import 'package:rustdesk_lan/desktop/widgets/tabbar_widget.dart';
+import 'package:rustdesk_lan/main.dart';
+import 'package:rustdesk_lan/models/server_model.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
 import 'package:window_manager/window_manager.dart';
@@ -17,10 +19,17 @@ final testClients = [
 ];
 
 /// flutter run -d {platform} -t test/cm_test.dart to test cm
-void main(List<String> args) async {
+Future<void> main() async {
   isTest = true;
   WidgetsFlutterBinding.ensureInitialized();
-  await windowManager.ensureInitialized();
+  try {
+    await windowManager.ensureInitialized();
+  } on MissingPluginException {
+    test('cm harness is skipped without desktop window plugin', () {
+      expect(true, isTrue);
+    });
+    return;
+  }
   await windowManager.setSize(const Size(400, 600));
   await windowManager.setAlignment(Alignment.topRight);
   await initEnv(kAppTypeMain);

@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_hbb/consts.dart';
-import 'package:flutter_hbb/models/peer_model.dart';
-import 'package:flutter_hbb/models/platform_model.dart';
+import 'package:rustdesk_lan/consts.dart';
+import 'package:rustdesk_lan/models/peer_model.dart';
+import 'package:rustdesk_lan/models/platform_model.dart';
 import 'package:get/get.dart';
 
 import '../common.dart';

@@ -5,7 +5,7 @@ import 'package:flutter_custom_cursor/flutter_custom_cursor.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
-import 'package:flutter_hbb/models/model.dart';
+import 'package:rustdesk_lan/models/model.dart';
 
 deleteCustomCursor(String key) =>
     custom_cursor_manager.CursorManager.instance.deleteCursor(key);
