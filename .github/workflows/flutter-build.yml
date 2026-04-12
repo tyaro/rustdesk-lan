@@ -28,6 +28,7 @@ env:
   CARGO_NDK_VERSION: "3.1.2"
   LLVM_VERSION: "15.0.6"
   FLUTTER_VERSION: "3.35.0"
+  WINDOWS_FLUTTER_VERSION: "3.38.10"
   ANDROID_FLUTTER_VERSION: "3.35.0"
   # for arm64 linux because official Dart SDK does not work
   FLUTTER_ELINUX_VERSION: "3.16.9"
@@ -109,7 +110,7 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: "stable"
-          flutter-version: ${{ env.FLUTTER_VERSION }}
+          flutter-version: ${{ env.WINDOWS_FLUTTER_VERSION }}
           cache: false
           pub-cache-path: default
 
