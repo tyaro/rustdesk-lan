@@ -1,11 +1,11 @@
 import 'native_model.dart' if (dart.library.html) 'web_model.dart';
 import 'package:rustdesk_lan/generated_bridge.dart'
-    if (dart.library.html) 'package:rustdesk_lan/web/bridge.dart';
+  if (dart.library.html) 'package:rustdesk_lan/web/bridge.dart';
 
 final platformFFI = PlatformFFI.instance;
 final localeName = PlatformFFI.localeName;
 
-RustdeskImpl get bind => platformFFI.ffiBind;
+RustdeskLan get bind => platformFFI.ffiBind;
 
 String ffiGetByName(String name, [String arg = '']) {
   return PlatformFFI.getByName(name, arg);

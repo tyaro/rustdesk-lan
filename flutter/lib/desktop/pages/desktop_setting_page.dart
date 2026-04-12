@@ -433,17 +433,17 @@ class _GeneralState extends State<_General> {
 
     final isOptFixed = isOptionFixed(kCommConfKeyTheme);
     return _Card(title: 'Theme', children: [
-      _Radio<String>(context,
+      _Radio(context,
           value: 'light',
           groupValue: current,
           label: 'Light',
           onChanged: isOptFixed ? null : onChanged),
-      _Radio<String>(context,
+      _Radio(context,
           value: 'dark',
           groupValue: current,
           label: 'Dark',
           onChanged: isOptFixed ? null : onChanged),
-      _Radio<String>(context,
+      _Radio(context,
           value: 'system',
           groupValue: current,
           label: 'Follow System',
@@ -1060,7 +1060,7 @@ class _SafetyState extends State<_Safety> with AutomaticKeepAliveClientMixin {
           String currentValue =
               passwordValues[passwordKeys.indexOf(model.verificationMethod)];
           List<Widget> radios = passwordValues
-              .map((value) => _Radio<String>(
+              .map((value) => _Radio(
                     context,
                     value: value,
                     groupValue: currentValue,
@@ -2516,14 +2516,14 @@ Widget _OptionCheckBox(
 }
 
 // ignore: non_constant_identifier_names
-Widget _Radio<T>(BuildContext context,
-    {required T value,
-    required T groupValue,
+Widget _Radio(BuildContext context,
+    {required String value,
+    required String groupValue,
     required String label,
-    required Function(T value)? onChanged,
+    required FutureOr<void> Function(String value)? onChanged,
     bool autoNewLine = true}) {
   final onChange2 = onChanged != null
-      ? (T? value) {
+      ? (String? value) {
           if (value != null) {
             onChanged(value);
           }
@@ -2532,7 +2532,8 @@ Widget _Radio<T>(BuildContext context,
   return GestureDetector(
     child: Row(
       children: [
-        Radio<T>(value: value, groupValue: groupValue, onChanged: onChange2),
+        Radio<String>(
+          value: value, groupValue: groupValue, onChanged: onChange2),
         Expanded(
           child: Text(translate(label),
                   overflow: autoNewLine ? null : TextOverflow.ellipsis,
