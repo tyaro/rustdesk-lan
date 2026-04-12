@@ -1,6 +1,8 @@
-# RustDesk Guide 
+# RustDesk LAN-Only Edition Guide
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this **LAN-only** RustDesk variant.
+
+**Note**: This is a specialized build for local LAN networks only. It has been simplified by removing rendezvous servers, relay infrastructure, and NAT punching. Direct IP connections and LAN peer discovery are the only supported connection methods.
 
 ## Development Commands
 
@@ -43,7 +45,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - `libs/clipboard/` - Cross-platform clipboard implementation
 
 ### Key Components
-- **Remote Desktop Protocol**: Custom protocol implemented in `src/rendezvous_mediator.rs` for communicating with rustdesk-server
+
+- **LAN Connection**: Direct IP connection handling without relay/rendezvous infrastructure in `src/client.rs`
 - **Screen Capture**: Platform-specific screen capture in `libs/scrap/`
 - **Input Handling**: Cross-platform input simulation in `libs/enigo/`
 - **Audio/Video Services**: Real-time audio/video streaming in `src/server/`
