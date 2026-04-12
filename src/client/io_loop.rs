@@ -218,7 +218,8 @@ impl<T: InvokeUiSession> Remote<T> {
                     crate::rustdesk_interval(time::interval(Duration::new(1, 0)));
                 let mut fps_instant = Instant::now();
 
-                let _keep_it = client::hc_connection(feedback, rendezvous_server, token).await;
+                let _keep_it: Option<()> = None; // LAN-only mode: hc_connection (rendezvous health check) is disabled
+                // let _keep_it = client::hc_connection(feedback, rendezvous_server, token).await;
 
                 loop {
                     tokio::select! {

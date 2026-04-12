@@ -124,7 +124,8 @@ async fn connect_and_login(
     let mut buffer = Vec::new();
     let mut received = false;
 
-    let _keep_it = hc_connection(feedback, rendezvous_server, token).await;
+    let _keep_it: Option<()> = None; // LAN-only mode: hc_connection (rendezvous health check) is disabled
+    // let _keep_it = hc_connection(feedback, rendezvous_server, token).await;
 
     loop {
         tokio::select! {
