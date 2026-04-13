@@ -449,7 +449,7 @@ def build_flutter_windows(version, features, skip_portable_pack):
     python_cmd = 'python' if windows else 'python3'
     system2(f'{pip_cmd} install -r requirements.txt')
     system2(
-        f'{python_cmd} ./generate.py -f ../../{flutter_build_dir_2} -o . -e ../../{flutter_build_dir_2}/rustdesk.exe')
+        f'{python_cmd} ./generate.py -f ../../{flutter_build_dir_2} -o . -e ../../{flutter_build_dir_2}/rustdesk-lan.exe')
     os.chdir('../..')
     if os.path.exists('./rustdesk_portable.exe'):
         os.replace('./target/release/rustdesk-portable-packer.exe',

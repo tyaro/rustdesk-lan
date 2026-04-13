@@ -1571,7 +1571,7 @@ String translate(String name) {
 bool option2bool(String option, String value) {
   bool res;
   if (option == kOptionDirectServer) {
-    res = value != "N";
+    res = value == "Y";
   } else if (option == kOptionEnableCheckUpdate) {
     res = value == "Y";
   } else if (option.startsWith("enable-")) {
