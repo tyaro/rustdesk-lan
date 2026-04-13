@@ -135,13 +135,13 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
         with:
-          prefix-key: ${{ env.RUST_TOOLCHAIN_VERSION }}-${{ matrix.job.target }}-
+          prefix-key: rustdesk-lib-cache-android-aarch64
           workspaces: |
-            src-tauri -> target
+            . -> target
 
       - name: Install cargo-ndk
         run: |
-          cargo install cargo-ndk@${{ env.CARGO_NDK_VERSION }}
+          cargo install cargo-ndk --version ${{ env.CARGO_NDK_VERSION }} --locked
 
       - name: Resolve version from Cargo.toml
         run: |
@@ -151,12 +151,9 @@ jobs:
       - name: Build rustdesk android library
         env:
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+          ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
         run: |
-          cargo ndk \
-            -t aarch64-linux-android \
-            --manifest-path src-tauri/Cargo.toml \
-            --android-platform 21 \
-            build --release
+          ./flutter/ndk_arm64.sh
           # Copy built library to expected location
           mkdir -p ./flutter/android/app/src/main/jniLibs/arm64-v8a
           cp target/aarch64-linux-android/release/liblibrustdesk.so ./flutter/android/app/src/main/jniLibs/arm64-v8a/
