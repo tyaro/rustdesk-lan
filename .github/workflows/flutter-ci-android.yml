@@ -154,15 +154,12 @@ jobs:
         run: |
           cargo ndk \
             -t aarch64-linux-android \
-            --manifest-path src-tauri/src/Cargo.toml \
+            --manifest-path src-tauri/Cargo.toml \
             --android-platform 21 \
             build --release
-
-      - name: Download Rustdesk library from Artifacts
-        uses: actions/download-artifact@master
-        with:
-          name: librustdesk.so.aarch64-linux-android
-          path: ./flutter/android/app/src/main/jniLibs/arm64-v8a
+          # Copy built library to expected location
+          mkdir -p ./flutter/android/app/src/main/jniLibs/arm64-v8a
+          cp target/aarch64-linux-android/release/liblibrustdesk.so ./flutter/android/app/src/main/jniLibs/arm64-v8a/
 
       - name: Build rustdesk
         shell: bash
@@ -173,7 +170,6 @@ jobs:
           export PATH=/usr/lib/jvm/java-17-openjdk-amd64/bin:$PATH
           sed -i "s/org.gradle.jvmargs=-Xmx1024M/org.gradle.jvmargs=-Xmx2g/g" ./flutter/android/gradle.properties
           sed -i "s/signingConfigs.release/signingConfigs.debug/g" ./flutter/android/app/build.gradle
-          mv ./flutter/android/app/src/main/jniLibs/arm64-v8a/liblibrustdesk.so ./flutter/android/app/src/main/jniLibs/arm64-v8a/librustdesk.so
           cp ${ANDROID_NDK_HOME}/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib/aarch64-linux-android/libc++_shared.so ./flutter/android/app/src/main/jniLibs/arm64-v8a/
           pushd flutter
           flutter build apk --release --target-platform android-arm64
