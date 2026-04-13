@@ -54,7 +54,7 @@ env:
   # 2. Update the `VCPKG_COMMIT_ID` in `ci.yml` and `playground.yml`.
   VCPKG_COMMIT_ID: "120deac3062162151622ca4860575a33844ba10b"
   ARMV7_VCPKG_COMMIT_ID: "6f29f12e82a8293156836ad81cc9bf5af41fe836" # 2025.01.13, got "/opt/artifacts/vcpkg/vcpkg: No such file or directory" with latest version
-  VERSION: "1.5.0"
+  VERSION: ""
   NDK_VERSION: "r28c"
   #signing keys env variable checks
   ANDROID_SIGNING_KEY: "${{ secrets.ANDROID_SIGNING_KEY }}"
@@ -254,6 +254,18 @@ jobs:
           name: rustdesk-unsigned-windows-${{ matrix.job.arch }}
           path: rustdesk
 
+      - name: Resolve version from Cargo.toml
+        if: env.UPLOAD_ARTIFACT == 'true'
+        shell: bash
+        run: |
+          version=$(grep '^version = ' Cargo.toml | head -1 | sed -E 's/version = "([^"]+)"/\1/')
+          if [ -z "$version" ]; then
+            echo "Failed to resolve version from Cargo.toml"
+            exit 1
+          fi
+          echo "VERSION=$version" >> $GITHUB_ENV
+          echo "Resolved VERSION=$version"
+
       - name: Sign rustdesk files
         if: env.UPLOAD_ARTIFACT == 'true' && env.SIGN_BASE_URL != '-2'
         shell: bash
@@ -280,7 +292,7 @@ jobs:
         if: env.UPLOAD_ARTIFACT == 'true'
         run: |
           pushd ./res/msi
-          python preprocess.py --arp -d ../../rustdesk --app-name RustDesk --exe-name rustdesk-lan.exe -v ${{ env.VERSION }}
+          python preprocess.py --arp -d ../../rustdesk --app-name RustDesk-lan --exe-name rustdesk-lan.exe -v ${{ env.VERSION }}
           nuget restore msi.sln
           msbuild msi.sln -p:Configuration=Release -p:Platform=x64 /p:TargetVersion=Windows10
           mv ./Package/bin/x64/Release/en-us/Package.msi ../../SignOutput/rustdesk-${{ env.VERSION }}-${{ matrix.job.arch }}.msi
@@ -296,7 +308,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         if: env.UPLOAD_ARTIFACT == 'true'
         with:
-          prerelease: true
+          prerelease: ${{ !startsWith(env.TAG_NAME, 'v') }}
           tag_name: ${{ env.TAG_NAME }}
           files: |
             ./SignOutput/rustdesk-*.msi
