@@ -24,6 +24,8 @@ env:
   RUST_VERSION: "1.75"
   ANDROID_FLUTTER_VERSION: "3.35.0"
   CARGO_NDK_VERSION: "3.1.2"
+  VCPKG_COMMIT_ID: "120deac3062162151622ca4860575a33844ba10b"
+  VCPKG_ROOT: "/opt/artifacts/vcpkg"
   TAG_NAME: "v${{ github.event.inputs.base-version }}-custom-${{ github.event.inputs.custom-release-suffix }}"
   ANDROID_SIGNING_KEY: "${{ secrets.ANDROID_SIGNING_KEY }}"
   NDK_VERSION: "r28c"
@@ -119,7 +121,32 @@ jobs:
         id: setup-ndk
         with:
           ndk-version: ${{ env.NDK_VERSION }}
-          add-to-path: false
+          add-to-path: true
+
+      - name: Setup vcpkg with Github Actions binary cache
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgDirectory: /opt/artifacts/vcpkg
+          vcpkgGitCommitId: ${{ env.VCPKG_COMMIT_ID }}
+          doNotCache: false
+
+      - name: Install vcpkg dependencies
+        shell: bash
+        env:
+          ANDROID_NDK: ${{ steps.setup-ndk.outputs.ndk-path }}
+          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+          ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
+        run: |
+          if ! ./flutter/build_android_deps.sh arm64-v8a; then
+            find "${VCPKG_ROOT}/" -name "*.log" | while read -r _1; do
+              echo "$_1:"
+              echo "======"
+              cat "$_1"
+              echo "======"
+              echo ""
+            done
+            exit 1
+          fi
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@v1
@@ -150,6 +177,8 @@ jobs:
 
       - name: Build rustdesk android library
         env:
+          VCPKG_ROOT: ${{ env.VCPKG_ROOT }}
+          ANDROID_NDK: ${{ steps.setup-ndk.outputs.ndk-path }}
           ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
           ANDROID_NDK_ROOT: ${{ steps.setup-ndk.outputs.ndk-path }}
         run: |
