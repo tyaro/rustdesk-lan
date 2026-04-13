@@ -430,7 +430,7 @@ jobs:
         if: env.UPLOAD_ARTIFACT == 'true'
         uses: softprops/action-gh-release@v1
         with:
-          prerelease: true
+          prerelease: ${{ !startsWith(env.TAG_NAME, 'v') }}
           tag_name: ${{ env.TAG_NAME }}
           files: |
             flutter/build/ios/ipa/*.ipa

@@ -2,6 +2,15 @@ name: CI - iOS Build
 
 on:
   workflow_dispatch:
+    inputs:
+      base-version:
+        description: "Base app version (from Cargo.toml)"
+        required: true
+        default: "1.4.6"
+      custom-release-suffix:
+        description: "Custom release suffix (increment each release, e.g. 0.1, 0.2, 0.3)"
+        required: true
+        default: "0.1"
   # LAN運用向け: GitHub Actions利用制限回避のため自動実行は無効化
 
 concurrency:
@@ -16,7 +25,7 @@ jobs:
     uses: ./.github/workflows/flutter-build.yml
     with:
       upload-artifact: true
-      upload-tag: "nightly"
+      upload-tag: "v${{ inputs.base-version }}-custom-${{ inputs.custom-release-suffix }}"
       build-windows: false
       build-android: false
       build-ios: true
