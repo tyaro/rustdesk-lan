@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:rustdesk_lan/common/widgets/connection_page_title.dart';
@@ -12,12 +13,14 @@ import 'package:rustdesk_lan/models/state_model.dart';
 import 'package:get/get.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:rustdesk_lan/models/peer_model.dart';
+import 'package:image/image.dart' as img2;
 
 import '../../common.dart';
 import '../../common/formatter/id_formatter.dart';
 import '../../common/widgets/peer_tab_page.dart';
 import '../../common/widgets/autocomplete.dart';
 import '../../models/platform_model.dart';
+import '../../utils/multi_window_manager.dart';
 import '../../desktop/widgets/material_mod_popup_menu.dart' as mod_menu;
 
 class OnlineStatusWidget extends StatefulWidget {
@@ -204,6 +207,19 @@ class _ConnectionPageState extends State<ConnectionPage>
   Iterable<Peer> _autocompleteOpts = [];
 
   final _menuOpen = false.obs;
+
+  Future<void> _showConnectionTilePicker() async {
+    final sessions = await rustDeskWinManager.getRemoteSessionDisplayMeta();
+    if (!mounted) return;
+    if (sessions.isEmpty) {
+      showToast(translate('No active sessions'));
+      return;
+    }
+    await showDialog(
+      context: context,
+      builder: (ctx) => _ConnectionTilePickerDialog(initialSessions: sessions),
+    );
+  }
 
   @override
   void initState() {
@@ -511,6 +527,15 @@ class _ConnectionPageState extends State<ConnectionPage>
                   ),
                 ),
                 const SizedBox(width: 8),
+                SizedBox(
+                  height: 28.0,
+                  child: OutlinedButton.icon(
+                    onPressed: _showConnectionTilePicker,
+                    icon: const Icon(Icons.grid_view, size: 14),
+                    label: Text(translate('Tiles')),
+                  ),
+                ),
+                const SizedBox(width: 8),
                 Container(
                   height: 28.0,
                   width: 28.0,
@@ -597,5 +622,206 @@ class _ConnectionPageState extends State<ConnectionPage>
     );
     return Container(
         constraints: const BoxConstraints(maxWidth: 600), child: w);
+  }
+}
+
+class _ConnectionTilePickerDialog extends StatefulWidget {
+  final List<RemoteSessionDisplayMeta> initialSessions;
+  const _ConnectionTilePickerDialog({required this.initialSessions});
+
+  @override
+  State<_ConnectionTilePickerDialog> createState() =>
+      _ConnectionTilePickerDialogState();
+}
+
+class _ConnectionTilePickerDialogState extends State<_ConnectionTilePickerDialog> {
+  late List<RemoteSessionDisplayMeta> _sessions;
+  final Map<String, Uint8List> _previewJpegs = {};
+  Timer? _timer;
+  bool _refreshing = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _sessions = widget.initialSessions;
+    _refreshLoop();
+    _timer = Timer.periodic(const Duration(milliseconds: 1200), (_) {
+      _refreshLoop();
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  String _keyOf(RemoteSessionDisplayMeta s) => '${s.id}|${s.sessionId}';
+
+  Future<Uint8List?> _buildPreview(RemoteSessionDisplayMeta s) async {
+    if (s.sessionId.isEmpty) return null;
+    try {
+      final sid = SessionID(s.sessionId);
+      final display = s.currentDisplay < 0 ? 0 : s.currentDisplay;
+      final size = platformFFI.getRgbaSize(sid, display);
+      if (size <= 0) return null;
+      
+      Uint8List? rgba;
+      try {
+        rgba = platformFFI.getRgba(sid, display, size);
+        if (rgba == null || rgba.isEmpty) return null;
+        
+        var w = s.previewWidth;
+        var h = s.previewHeight;
+        if (w <= 0 || h <= 0 || w * h * 4 > rgba.length) {
+          final pixels = rgba.length ~/ 4;
+          if (pixels <= 0) return null;
+          w = max(1, sqrt(pixels).toInt());
+          h = max(1, pixels ~/ w);
+        }
+        
+        final img = img2.Image.fromBytes(
+            width: w,
+            height: h,
+            bytes: rgba.buffer,
+            order: img2.ChannelOrder.rgba);
+        final thumb = img2.copyResize(img, width: 220);
+        return Uint8List.fromList(img2.encodeJpg(thumb, quality: 55));
+      } catch (e) {
+        debugPrint('Failed to build preview: $e');
+        return null;
+      } finally {
+        if (rgba != null) {
+          try {
+            platformFFI.nextRgba(sid, display);
+          } catch (e) {
+            debugPrint('Failed to call nextRgba: $e');
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('Failed to create SessionID or get preview: $e');
+      return null;
+    }
+  }
+
+  Future<void> _refreshLoop() async {
+    if (_refreshing) return;
+    _refreshing = true;
+    try {
+      if (!mounted) return;
+      final sessions = await rustDeskWinManager.getRemoteSessionDisplayMeta();
+      final nextPreview = <String, Uint8List>{};
+      for (final s in sessions) {
+        if (!mounted) break;
+        final bytes = await _buildPreview(s);
+        if (bytes != null) {
+          nextPreview[_keyOf(s)] = bytes;
+        }
+      }
+      if (!mounted) return;
+      setState(() {
+        _sessions = sessions;
+        _previewJpegs
+          ..clear()
+          ..addAll(nextPreview);
+      });
+    } catch (e) {
+      debugPrint('Error in _refreshLoop: $e');
+    } finally {
+      _refreshing = false;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(translate('Select active connection')),
+      content: SizedBox(
+        width: 760,
+        child: SingleChildScrollView(
+          child: Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: _sessions.map((s) {
+              final displayCount = s.displayCount <= 0 ? 1 : s.displayCount;
+              final preview = _previewJpegs[_keyOf(s)];
+              return Container(
+                width: 340,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Theme.of(context).dividerColor),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      s.id,
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.w700),
+                    ),
+                    const SizedBox(height: 8),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Container(
+                        height: 120,
+                        width: double.infinity,
+                        color: Colors.black12,
+                        child: preview == null
+                            ? Center(
+                                child: Text(
+                                  translate('Loading ...'),
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                ),
+                              )
+                            : Image.memory(
+                                preview,
+                                fit: BoxFit.cover,
+                                gaplessPlayback: true,
+                              ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 6,
+                      children: List.generate(displayCount, (idx) {
+                        final selected = s.currentDisplay == idx;
+                        return OutlinedButton(
+                          onPressed: () async {
+                            Navigator.of(context).pop();
+                            final ok = await rustDeskWinManager
+                                .activateRemoteDisplaySession(s.id, idx);
+                            if (!ok && mounted) {
+                              connect(context, s.id);
+                            }
+                          },
+                          style: OutlinedButton.styleFrom(
+                            backgroundColor: selected
+                                ? Theme.of(context)
+                                    .colorScheme
+                                    .primary
+                                    .withOpacity(0.1)
+                                : null,
+                          ),
+                          child: Text('${translate('Display')} ${idx + 1}'),
+                        );
+                      }),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(translate('Close')),
+        )
+      ],
+    );
   }
 }

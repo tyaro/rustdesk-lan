@@ -93,6 +93,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
       buildTip(context),
       if (!isOutgoingOnly) buildIDBoard(context),
       if (!isOutgoingOnly) buildPasswordBoard(context),
+      if (!isOutgoingOnly) buildIPBoard(context),
       FutureBuilder<Widget>(
         future: Future.value(
             Obx(() => buildHelpCards(stateGlobal.updateUrl.value))),
@@ -385,6 +386,70 @@ class _DesktopHomePageState extends State<DesktopHomePage>
           ),
         ],
       ),
+    );
+  }
+
+  Future<List<String>> _getLocalIPs() async {
+    try {
+      final interfaces = await NetworkInterface.list(
+          type: InternetAddressType.IPv4, includeLinkLocal: false);
+      return interfaces
+          .expand((ni) => ni.addresses)
+          .where((addr) => !addr.isLoopback)
+          .map((addr) => addr.address)
+          .toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  buildIPBoard(BuildContext context) {
+    final textColor = Theme.of(context).textTheme.titleLarge?.color;
+    return FutureBuilder<List<String>>(
+      future: _getLocalIPs(),
+      builder: (context, snapshot) {
+        final ips = snapshot.data ?? [];
+        if (ips.isEmpty) return const SizedBox.shrink();
+        return Container(
+          margin: const EdgeInsets.only(left: 20.0, right: 16, bottom: 13),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 2,
+                height: 20.0 + ips.length * 22.0,
+                decoration: const BoxDecoration(color: MyTheme.accent),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 7),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        translate('IP Address'),
+                        style: TextStyle(
+                            fontSize: 14,
+                            color: textColor?.withOpacity(0.5)),
+                      ),
+                      ...ips.map((ip) => GestureDetector(
+                            onDoubleTap: () {
+                              Clipboard.setData(ClipboardData(text: ip));
+                              showToast(translate('Copied'));
+                            },
+                            child: Text(
+                              ip,
+                              style: const TextStyle(fontSize: 15),
+                            ).marginOnly(top: 4),
+                          )),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 

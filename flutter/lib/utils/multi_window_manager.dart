@@ -49,6 +49,40 @@ class MultiWindowCallResult {
   MultiWindowCallResult(this.windowId, this.result);
 }
 
+class RemoteSessionDisplayMeta {
+  final String id;
+  final String sessionId;
+  final int displayCount;
+  final int currentDisplay;
+  final int previewWidth;
+  final int previewHeight;
+
+  const RemoteSessionDisplayMeta({
+    required this.id,
+    required this.sessionId,
+    required this.displayCount,
+    required this.currentDisplay,
+    required this.previewWidth,
+    required this.previewHeight,
+  });
+
+  factory RemoteSessionDisplayMeta.fromJson(Map<String, dynamic> json) {
+    int toInt(dynamic v) {
+      if (v is int) return v;
+      if (v is num) return v.toInt();
+      return int.tryParse(v?.toString() ?? '') ?? 0;
+    }
+    return RemoteSessionDisplayMeta(
+      id: (json['id'] ?? '').toString(),
+      sessionId: (json['session_id'] ?? '').toString(),
+      displayCount: toInt(json['display_count']),
+      currentDisplay: toInt(json['current_display']),
+      previewWidth: toInt(json['preview_width']),
+      previewHeight: toInt(json['preview_height']),
+    );
+  }
+}
+
 /// Window Manager
 /// mainly use it in `Main Window`
 /// use it in sub window is not recommended
@@ -575,6 +609,39 @@ class RustDeskMultiWindowManager {
       coords.add(RemoteWindowCoords.fromJson(jsonDecode(item)));
     }
     return coords;
+  }
+
+  Future<List<RemoteSessionDisplayMeta>> getRemoteSessionDisplayMeta() async {
+    final List<RemoteSessionDisplayMeta> sessions = [];
+    for (final windowId in _remoteDesktopWindows) {
+      if (!_activeWindows.contains(windowId)) continue;
+      final res = await DesktopMultiWindow.invokeMethod(
+          windowId, kWindowEventGetSessionDisplayMeta, '');
+      if (res == null) continue;
+      try {
+        final list = jsonDecode(res) as List<dynamic>;
+        for (final item in list) {
+          sessions.add(RemoteSessionDisplayMeta.fromJson(item));
+        }
+      } catch (e) {
+        debugPrint('Failed to parse session display meta from $windowId: $e');
+      }
+    }
+    return sessions;
+  }
+
+  Future<bool> activateRemoteDisplaySession(String remoteId, int display) async {
+    for (final windowId in _remoteDesktopWindows) {
+      if (!_activeWindows.contains(windowId)) continue;
+      final jumpOk = await DesktopMultiWindow.invokeMethod(
+          windowId,
+          kWindowEventActiveDisplaySession,
+          jsonEncode({'id': remoteId, 'display': display}));
+      if (jumpOk == true) {
+        return true;
+      }
+    }
+    return false;
   }
 }
 

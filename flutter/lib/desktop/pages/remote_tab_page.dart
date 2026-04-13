@@ -508,6 +508,38 @@ class _ConnectionTabPageState extends State<ConnectionTabPage> {
           .map((e) => '${e.key},${(e.page as RemotePage).ffi.sessionId}')
           .toList()
           .join(';');
+    } else if (call.method == kWindowEventGetSessionDisplayMeta) {
+      try {
+        final sessions = tabController.state.value.tabs.map((e) {
+          try {
+            final page = e.page as RemotePage;
+            final pi = page.ffi.ffiModel.pi;
+            final rect = page.ffi.ffiModel.displaysRect();
+            return {
+              'id': e.key,
+              'session_id': page.ffi.sessionId.toString(),
+              'display_count': pi.displays.length,
+              'current_display': pi.currentDisplay,
+              'preview_width': rect?.width.toInt() ?? 0,
+              'preview_height': rect?.height.toInt() ?? 0,
+            };
+          } catch (ex) {
+            debugPrint('Failed to get session display meta for tab: $ex');
+            return {
+              'id': e.key,
+              'session_id': '',
+              'display_count': 0,
+              'current_display': -1,
+              'preview_width': 0,
+              'preview_height': 0,
+            };
+          }
+        }).toList();
+        return jsonEncode(sessions);
+      } catch (e) {
+        debugPrint('Failed to process session display metadata: $e');
+        return jsonEncode([]);
+      }
     } else if (call.method == kWindowEventGetCachedSessionData) {
       // Ready to show new window and close old tab.
       final args = jsonDecode(call.arguments);

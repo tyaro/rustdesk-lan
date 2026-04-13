@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -565,6 +566,51 @@ class ServerInfo extends StatelessWidget {
                           })
                     ])
             ]).marginOnly(left: 40, bottom: 15),
+            // IP Address
+            Row(children: [
+              const Icon(Icons.lan_outlined,
+                      color: Colors.grey, size: iconSize)
+                  .marginOnly(right: iconMarginRight),
+              Text(
+                translate('IP Address'),
+                style: textStyleHeading,
+              )
+            ]),
+            FutureBuilder<List<String>>(
+              future: () async {
+                try {
+                  final interfaces = await NetworkInterface.list(
+                      type: InternetAddressType.IPv4,
+                      includeLinkLocal: false);
+                  return interfaces
+                      .expand((ni) => ni.addresses)
+                      .where((addr) => !addr.isLoopback)
+                      .map((addr) => addr.address)
+                      .toList();
+                } catch (_) {
+                  return <String>[];
+                }
+              }(),
+              builder: (context, snapshot) {
+                final ips = snapshot.data ?? [];
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: ips
+                      .map((ip) => Row(
+                              mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(ip, style: textStyleValue),
+                                IconButton(
+                                    visualDensity: VisualDensity.compact,
+                                    icon: Icon(Icons.copy_outlined),
+                                    onPressed: () => copyToClipboard(ip))
+                              ])
+                          .marginOnly(left: 39))
+                      .toList(),
+                );
+              },
+            ).marginOnly(bottom: 10),
             ConnectionStateNotification()
           ],
         ));
