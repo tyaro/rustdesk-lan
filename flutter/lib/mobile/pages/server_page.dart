@@ -64,7 +64,7 @@ class _DropDownAction extends StatelessWidget {
           return [
             if (!isChangeIdDisabled())
               PopupMenuItem(
-                enabled: gFFI.serverModel.connectStatus > 0,
+                enabled: true,
                 value: "changeID",
                 child: Text(translate("Change ID")),
               ),

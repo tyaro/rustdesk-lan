@@ -945,7 +945,7 @@ class _SafetyState extends State<_Safety> with AutomaticKeepAliveClientMixin {
         value: gFFI.serverModel,
         child: Consumer<ServerModel>(builder: ((context, model, child) {
           return _Button('Change ID', changeIdDialog,
-              enabled: !locked && model.connectStatus > 0);
+              enabled: !locked);
         })));
   }
 

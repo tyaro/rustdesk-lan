@@ -192,19 +192,23 @@ impl Client {
         id.chars().filter(|c| !c.is_whitespace()).collect()
     }
 
-    fn resolve_lan_peer_addr_by_id(peer: &str) -> Option<String> {
+    fn resolve_lan_peer_addrs_by_id(peer: &str) -> Vec<String> {
         let target = Self::normalize_peer_id(peer);
         if target.is_empty() {
-            return None;
+            return Vec::new();
         }
+        let mut addrs = Vec::new();
         for lan_peer in config::LanPeers::load().peers.iter() {
             if Self::normalize_peer_id(&lan_peer.id) == target {
-                if let Some((ip, _mac)) = lan_peer.ip_mac.iter().next() {
-                    return Some(check_port(ip, RELAY_PORT + 1));
+                for (ip, _mac) in lan_peer.ip_mac.iter() {
+                    let addr = check_port(ip, RELAY_PORT + 1);
+                    if !addrs.iter().any(|a| a == &addr) {
+                        addrs.push(addr);
+                    }
                 }
             }
         }
-        None
+        addrs
     }
 
     /// Start a new connection.
@@ -304,18 +308,31 @@ impl Client {
         }
 
         // LAN-only mode: when an ID matches a discovered LAN peer, connect directly by IP.
-        if let Some(peer_addr) = Self::resolve_lan_peer_addr_by_id(peer) {
-            return Ok((
-                (
-                    connect_tcp_local(peer_addr, None, CONNECT_TIMEOUT).await?,
-                    true,
-                    None,
-                    None,
-                    "TCP",
-                ),
-                (0, "".to_owned()),
-                false,
-            ));
+        // A peer may have multiple IP addresses (multi-NIC, VPN, etc.), so try all known addresses.
+        let peer_addrs = Self::resolve_lan_peer_addrs_by_id(peer);
+        if !peer_addrs.is_empty() {
+            let mut last_err = "".to_owned();
+            for peer_addr in peer_addrs.iter() {
+                match connect_tcp_local(peer_addr.clone(), None, CONNECT_TIMEOUT).await {
+                    Ok(stream) => {
+                        return Ok((
+                            (stream, true, None, None, "TCP"),
+                            (0, "".to_owned()),
+                            false,
+                        ));
+                    }
+                    Err(err) => {
+                        last_err = err.to_string();
+                        log::warn!("Failed LAN direct connect by id to {}: {}", peer_addr, err);
+                    }
+                }
+            }
+            bail!(
+                "Failed to connect LAN peer '{}' by discovered addresses ({}): {}",
+                peer,
+                peer_addrs.join(", "),
+                last_err
+            );
         }
 
         // LAN-only mode: hbbs/hbbr (rendezvous/relay) path is permanently disabled.
