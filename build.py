@@ -459,7 +459,7 @@ def build_flutter_windows(version, features, skip_portable_pack):
                   './rustdesk_portable.exe')
     print(
         f'output location: {os.path.abspath(os.curdir)}/rustdesk_portable.exe')
-    install_path = f'./rustdesk-{version}-install.exe'
+    install_path = f'./rustdesk-lan-{version}-setup.exe'
     if os.path.exists(install_path):
         os.replace('./rustdesk_portable.exe', install_path)
     else:

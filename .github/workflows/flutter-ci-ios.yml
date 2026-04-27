@@ -6,7 +6,7 @@ on:
       base-version:
         description: "Base app version (from Cargo.toml)"
         required: true
-        default: "1.4.6"
+        default: "1.5.0"
       custom-release-suffix:
         description: "Custom release suffix (increment each release, e.g. 0.1, 0.2, 0.3)"
         required: true
