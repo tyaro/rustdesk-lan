@@ -185,10 +185,20 @@ class DesktopTabController {
   bool jumpToByKeyAndDisplay(String key, int display, {bool isCamera = false}) {
     for (int i = 0; i < state.value.tabs.length; i++) {
       final tab = state.value.tabs[i];
-      if (tab.key == key) {
-        final ffi = isCamera
-            ? (tab.page as ViewCameraPage).ffi
-            : (tab.page as RemotePage).ffi;
+      final page = tab.page;
+      if (isCamera) {
+        if (page is! ViewCameraPage || page.id != key) {
+          continue;
+        }
+        final ffi = page.ffi;
+        if (ffi.ffiModel.pi.currentDisplay == display) {
+          return jumpTo(i, callOnSelected: true);
+        }
+      } else {
+        if (page is! RemotePage || page.id != key) {
+          continue;
+        }
+        final ffi = page.ffi;
         if (ffi.ffiModel.pi.currentDisplay == display) {
           return jumpTo(i, callOnSelected: true);
         }

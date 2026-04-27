@@ -35,6 +35,7 @@ class RemotePage extends StatefulWidget {
   RemotePage({
     Key? key,
     required this.id,
+    this.tabKey,
     required this.toolbarState,
     this.sessionId,
     this.tabWindowId,
@@ -46,10 +47,11 @@ class RemotePage extends StatefulWidget {
     this.forceRelay,
     this.isSharedPassword,
   }) : super(key: key) {
-    initSharedStates(id);
+    initSharedStates(stateId);
   }
 
   final String id;
+  final String? tabKey;
   final SessionID? sessionId;
   final int? tabWindowId;
   final int? display;
@@ -62,11 +64,13 @@ class RemotePage extends StatefulWidget {
   final SimpleWrapper<State<RemotePage>?> _lastState = SimpleWrapper(null);
   final DesktopTabController? tabController;
 
+  String get stateId => tabKey ?? id;
+
   FFI get ffi => (_lastState.value! as _RemotePageState)._ffi;
 
   @override
   State<RemotePage> createState() {
-    final state = _RemotePageState(id);
+    final state = _RemotePageState(stateId);
     _lastState.value = state;
     return state;
   }
@@ -101,11 +105,12 @@ class _RemotePageState extends State<RemotePage>
   Function(bool)? _onEnterOrLeaveImage4Toolbar;
 
   late FFI _ffi;
+  final String _stateId;
 
   SessionID get sessionId => _ffi.sessionId;
 
-  _RemotePageState(String id) {
-    _initStates(id);
+  _RemotePageState(this._stateId) {
+    _initStates(_stateId);
   }
 
   void _initStates(String id) {
@@ -119,7 +124,7 @@ class _RemotePageState extends State<RemotePage>
   void initState() {
     super.initState();
     _ffi = FFI(widget.sessionId);
-    Get.put<FFI>(_ffi, tag: widget.id);
+    Get.put<FFI>(_ffi, tag: _stateId);
     _ffi.imageModel.addCallbackOnFirstImage((String peerId) {
       _ffi.canvasModel.activateLocalCursor();
       showKBLayoutTypeChooserIfNeeded(
@@ -172,7 +177,7 @@ class _RemotePageState extends State<RemotePage>
     _blockableOverlayState.applyFfi(_ffi);
     // Call onSelected in post frame callback, since we cannot guarantee that the callback will not call setState.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      widget.tabController?.onSelected?.call(widget.id);
+      widget.tabController?.onSelected?.call(widget.stateId);
     });
 
     // Register callback to cancel debounce timer when relative mouse mode is disabled
@@ -306,7 +311,7 @@ class _RemotePageState extends State<RemotePage>
 
   @override
   Future<void> dispose() async {
-    final closeSession = closeSessionOnDispose.remove(widget.id) ?? true;
+    final closeSession = closeSessionOnDispose.remove(_stateId) ?? true;
 
     // https://github.com/flutter/flutter/issues/64935
     super.dispose();
@@ -339,8 +344,8 @@ class _RemotePageState extends State<RemotePage>
           overlays: SystemUiOverlay.values);
     }
     WakelockManager.disable(_uniqueKey);
-    await Get.delete<FFI>(tag: widget.id);
-    removeSharedStates(widget.id);
+    await Get.delete<FFI>(tag: _stateId);
+    removeSharedStates(_stateId);
   }
 
   Widget emptyOverlay() => BlockableOverlay(
@@ -439,7 +444,7 @@ class _RemotePageState extends State<RemotePage>
     }
 
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: Obx(() {
         final imageReady = _ffi.ffiModel.pi.isSet.isTrue &&
             _ffi.ffiModel.waitForFirstImage.isFalse;
@@ -583,7 +588,7 @@ class _RemotePageState extends State<RemotePage>
           canvasModel: _ffi.canvasModel,
           inputModel: _ffi.inputModel,
           child: Builder(builder: (context) {
-            final peerDisplay = CurrentDisplayState.find(widget.id);
+            final peerDisplay = CurrentDisplayState.find(_stateId);
             return Obx(
               () => _ffi.ffiModel.pi.isSet.isFalse
                   ? Container(color: Colors.transparent)

@@ -133,7 +133,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
       value: gFFI.serverModel,
       child: Container(
         width: isIncomingOnly ? 280.0 : 200.0,
-        color: Theme.of(context).colorScheme.background,
+        color: Theme.of(context).colorScheme.surface,
         child: Stack(
           children: [
             Column(
@@ -268,7 +268,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
             radius: 15,
             backgroundColor: hover.value
                 ? Theme.of(context).scaffoldBackgroundColor
-                : Theme.of(context).colorScheme.background,
+                : Theme.of(context).colorScheme.surface,
             child: Icon(
               Icons.more_vert_outlined,
               size: 20,
@@ -985,11 +985,7 @@ void setPasswordDialog({VoidCallback? notEmptyCallback}) async {
   var canSubmit = false;
   final RxString rxPass = "".obs;
   final rules = [
-    DigitValidationRule(),
-    UppercaseValidationRule(),
-    LowercaseValidationRule(),
-    // SpecialCharacterValidationRule(),
-    MinCharactersValidationRule(8),
+    MinCharactersValidationRule(1),
   ];
   final maxLength = bind.mainMaxEncryptLen();
   final statusTip = localPasswordSet
@@ -1170,7 +1166,7 @@ void setPasswordDialog({VoidCallback? notEmptyCallback}) async {
             close();
           },
           buttonStyle: ButtonStyle(
-              backgroundColor: MaterialStatePropertyAll(Colors.red)),
+              backgroundColor: WidgetStatePropertyAll(Colors.red)),
         );
         final okButton = dialogButton(
           "OK",

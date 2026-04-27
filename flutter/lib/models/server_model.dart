@@ -93,7 +93,7 @@ class ServerModel with ChangeNotifier {
   }
 
   String get temporaryPasswordLength {
-    final lengthIndex = ["6", "8", "10"].indexOf(_temporaryPasswordLength);
+    final lengthIndex = ["4", "6", "8", "10"].indexOf(_temporaryPasswordLength);
     if (lengthIndex < 0) {
       return "6";
     }

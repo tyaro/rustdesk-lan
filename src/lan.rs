@@ -303,23 +303,23 @@ fn spawn_wait_responses(sockets: Vec<UdpSocket>) -> UnboundedReceiver<config::Di
 }
 
 async fn handle_received_peers(mut rx: UnboundedReceiver<config::DiscoveryPeer>) -> ResultType<()> {
-    let mut peers = config::LanPeers::load().peers;
-    peers.iter_mut().for_each(|peer| {
-        peer.online = false;
-    });
-
+    let mut peers: Vec<config::DiscoveryPeer> = Vec::new();
     let mut response_set = HashSet::new();
     let mut last_write_time: Option<Instant> = None;
     loop {
         tokio::select! {
             data = rx.recv() => match data {
                 Some(mut peer) => {
+                    peer.online = true;
                     let in_response_set = !response_set.insert(peer.id.clone());
                     if let Some(pos) = peers.iter().position(|x| x.is_same_peer(&peer) ) {
                         let peer1 = peers.remove(pos);
-                        if in_response_set {
+                        peer.ip_mac.extend(peer1.ip_mac);
+                    }
+                    if in_response_set {
+                        if let Some(pos) = peers.iter().position(|x| x.id == peer.id) {
+                            let peer1 = peers.remove(pos);
                             peer.ip_mac.extend(peer1.ip_mac);
-                            peer.online = true;
                         }
                     }
                     peers.insert(0, peer);

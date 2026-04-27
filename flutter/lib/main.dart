@@ -145,6 +145,19 @@ void runMainApp(bool startService) async {
   }
   await Future.wait([gFFI.abModel.loadCache(), gFFI.groupModel.loadCache()]);
   gFFI.userModel.refreshCurrentUser();
+  
+  // Set default view style to Window Fit (Adaptive) if not already set
+  final viewStyle = bind.mainGetUserDefaultOption(key: kOptionViewStyle);
+  if (viewStyle.isEmpty) {
+    await bind.mainSetUserDefaultOption(key: kOptionViewStyle, value: kRemoteViewStyleAdaptive);
+  }
+  
+  // Enable LAN discovery by default
+  final lanDiscoveryEnabled = await bind.mainGetOption(key: kOptionEnableLanDiscovery);
+  if (lanDiscoveryEnabled.isEmpty || lanDiscoveryEnabled == 'N') {
+    await bind.mainSetOption(key: kOptionEnableLanDiscovery, value: 'Y');
+  }
+  
   runApp(App());
 
   bool? alwaysOnTop;

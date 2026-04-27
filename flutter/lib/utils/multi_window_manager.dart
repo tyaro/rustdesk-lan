@@ -167,13 +167,37 @@ class RustDeskMultiWindowManager {
         'b': screenRect.bottom,
       };
     }
+    final msg = jsonEncode(params);
+
+    if (!isCamera) {
+      int? preferredWindowId;
+      if (windowIDs.contains(windowId) && _activeWindows.contains(windowId)) {
+        preferredWindowId = windowId;
+      } else {
+        for (final wId in windowIDs) {
+          if (_activeWindows.contains(wId)) {
+            preferredWindowId = wId;
+            break;
+          }
+        }
+      }
+      if (preferredWindowId != null) {
+        await DesktopMultiWindow.invokeMethod(
+            preferredWindowId,
+            kWindowEventNewRemoteDesktop,
+            msg);
+        await registerActiveWindow(preferredWindowId);
+        return;
+      }
+    }
+
     await _newSession(
       false,
       windowType.windowType,
       isCamera ? kWindowEventNewViewCamera : kWindowEventNewRemoteDesktop,
       peerId,
       windowIDs,
-      jsonEncode(params),
+      msg,
       screenRect: screenRect,
     );
   }

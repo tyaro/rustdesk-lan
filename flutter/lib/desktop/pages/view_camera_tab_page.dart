@@ -131,7 +131,7 @@ class _ViewCameraTabPageState extends State<ViewCameraTabPage> {
   @override
   Widget build(BuildContext context) {
     final child = Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: DesktopTab(
         controller: tabController,
         onWindowCloseButton: handleWindowCloseButton,

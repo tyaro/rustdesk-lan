@@ -369,7 +369,7 @@ class _TerminalPageState extends State<TerminalPage>
         minimumSize: const Size(48, 32),
         padding: EdgeInsets.zero,
         textStyle: const TextStyle(fontSize: 12),
-        backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
+        backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
         foregroundColor: Theme.of(context).colorScheme.onSurfaceVariant,
       ),
     );

@@ -275,7 +275,7 @@ class _DesktopSettingPageState extends State<DesktopSettingPage>
   Widget build(BuildContext context) {
     super.build(context);
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: _buildBlock(
         children: <Widget>[
           SizedBox(
@@ -1102,7 +1102,7 @@ class _SafetyState extends State<_Safety> with AutomaticKeepAliveClientMixin {
                   }
                 }
               : null;
-          List<Widget> lengthRadios = ['6', '8', '10']
+          List<Widget> lengthRadios = ['4', '6', '8', '10']
               .map((value) => GestureDetector(
                     child: Row(
                       children: [
@@ -2656,7 +2656,7 @@ class _WaylandCardState extends State<WaylandCard> {
       showConfirmMsgBox,
       tip: 'clear_Wayland_screen_selection_tip',
       style: ButtonStyle(
-        backgroundColor: MaterialStateProperty.all<Color>(
+        backgroundColor: WidgetStateProperty.all<Color>(
             Theme.of(context).colorScheme.error.withOpacity(0.75)),
       ),
     );
@@ -2699,7 +2699,7 @@ class _WaylandCardState extends State<WaylandCard> {
         showConfirmMsgBox,
         tip: 'clear-shortcuts-inhibitor-permission-tip',
         style: ButtonStyle(
-          backgroundColor: MaterialStateProperty.all<Color>(
+          backgroundColor: WidgetStateProperty.all<Color>(
               Theme.of(context).colorScheme.error.withOpacity(0.75)),
         ),
       ),

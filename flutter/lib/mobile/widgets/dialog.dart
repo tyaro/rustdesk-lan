@@ -14,7 +14,7 @@ void _showSuccess() {
 
 void setTemporaryPasswordLengthDialog(
     OverlayDialogManager dialogManager) async {
-  List<String> lengths = ['6', '8', '10'];
+  List<String> lengths = ['4', '6', '8', '10'];
   String length = await bind.mainGetOption(key: "temporary-password-length");
   var index = lengths.indexOf(length);
   if (index < 0) index = 0;

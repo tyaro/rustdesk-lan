@@ -1415,10 +1415,6 @@ class FfiModel with ChangeNotifier {
     }
 
     notifyListeners();
-
-    if (!isCache) {
-      tryUseAllMyDisplaysForTheRemoteSession(peerId);
-    }
   }
 
   checkDesktopKeyboardMode() async {
@@ -1452,49 +1448,7 @@ class FfiModel with ChangeNotifier {
     }
   }
 
-  tryUseAllMyDisplaysForTheRemoteSession(String peerId) async {
-    if (bind.sessionGetUseAllMyDisplaysForTheRemoteSession(
-            sessionId: sessionId) !=
-        'Y') {
-      return;
-    }
 
-    if (!_pi.isSupportMultiDisplay || _pi.displays.length <= 1) {
-      return;
-    }
-
-    final screenRectList = await getScreenRectList();
-    if (screenRectList.length <= 1) {
-      return;
-    }
-
-    // to-do: peer currentDisplay is the primary display, but the primary display may not be the first display.
-    // local primary display also may not be the first display.
-    //
-    // 0 is assumed to be the primary display here, for now.
-
-    // move to the first display and set fullscreen
-    bind.sessionSwitchDisplay(
-      isDesktop: isDesktop,
-      sessionId: sessionId,
-      value: Int32List.fromList([0]),
-    );
-    _pi.currentDisplay = 0;
-    try {
-      CurrentDisplayState.find(peerId).value = _pi.currentDisplay;
-    } catch (e) {
-      //
-    }
-    await tryMoveToScreenAndSetFullscreen(screenRectList[0]);
-
-    final length = _pi.displays.length < screenRectList.length
-        ? _pi.displays.length
-        : screenRectList.length;
-    for (var i = 1; i < length; i++) {
-      openMonitorInNewTabOrWindow(i, peerId, _pi,
-          screenRect: screenRectList[i]);
-    }
-  }
 
   tryShowAndroidActionsOverlay({int delayMSecs = 10}) {
     if (isPeerAndroid) {
@@ -2912,7 +2866,7 @@ class CursorModel with ChangeNotifier {
   double _displayOriginY = 0;
   DateTime? _firstUpdateMouseTime;
   Rect? _windowRect;
-  List<RemoteWindowCoords> _remoteWindowCoords = [];
+  final List<RemoteWindowCoords> _remoteWindowCoords = [];
   bool gotMouseControl = true;
   DateTime _lastPeerMouse = DateTime.now()
       .subtract(Duration(milliseconds: 3000 * kMouseControlTimeoutMSec));

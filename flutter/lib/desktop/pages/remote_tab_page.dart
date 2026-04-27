@@ -52,6 +52,50 @@ class _ConnectionTabPageState extends State<ConnectionTabPage> {
 
   var connectionMap = RxList<Widget>.empty(growable: true);
 
+  static const String _displayTabKeySeparator = '@@display:';
+
+  String _makeRemoteTabKey(String id, int? display) {
+    if (display == null || display == kAllDisplayValue) {
+      return id;
+    }
+    return '$id$_displayTabKeySeparator$display';
+  }
+
+  String _peerIdFromTabKey(String tabKey) {
+    final idx = tabKey.indexOf(_displayTabKeySeparator);
+    if (idx < 0) {
+      return tabKey;
+    }
+    return tabKey.substring(0, idx);
+  }
+
+  int? _displayFromTabKey(String tabKey) {
+    final idx = tabKey.indexOf(_displayTabKeySeparator);
+    if (idx < 0) {
+      return null;
+    }
+    final v = tabKey.substring(idx + _displayTabKeySeparator.length);
+    return int.tryParse(v);
+  }
+
+  String _tabLabel(String tabKey) {
+    final id = _peerIdFromTabKey(tabKey);
+    final display = _displayFromTabKey(tabKey);
+    if (display == null) {
+      return id;
+    }
+    return '$id [D${display + 1}]';
+  }
+
+  bool _hasPeerTabs(String id) {
+    for (final tab in tabController.state.value.tabs) {
+      if (_peerIdFromTabKey(tab.key) == id) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   _ConnectionTabPageState(Map<String, dynamic> params) {
     RemoteCountState.init();
     peerId = params['id'];
@@ -65,33 +109,37 @@ class _ConnectionTabPageState extends State<ConnectionTabPage> {
     tryMoveToScreenAndSetFullscreen(screenRect);
     if (peerId != null) {
       ConnectionTypeState.init(peerId!);
-      tabController.onSelected = (id) {
-        final remotePage = tabController.widget(id);
+      tabController.onSelected = (tabKey) {
+        final remotePage = tabController.widget(tabKey);
         if (remotePage is RemotePage) {
           final ffi = remotePage.ffi;
           bind.setCurSessionId(sessionId: ffi.sessionId);
         }
+        final id = _peerIdFromTabKey(tabKey);
         WindowController.fromWindowId(params['windowId'])
             .setTitle(getWindowNameWithId(id));
         UnreadChatCountState.find(id).value = 0;
       };
+      final initTabKey = _makeRemoteTabKey(peerId!, display);
       tabController.add(TabInfo(
-        key: peerId!,
-        label: peerId!,
+        key: initTabKey,
+        label: _tabLabel(initTabKey),
         selectedIcon: selectedIcon,
         unselectedIcon: unselectedIcon,
         onTabCloseButton: () async {
+          final id = _peerIdFromTabKey(initTabKey);
           if (await desktopTryShowTabAuditDialogCloseCancelled(
-            id: peerId!,
+            id: id,
             tabController: tabController,
           )) {
             return;
           }
-          tabController.closeBy(peerId!);
+          tabController.closeBy(initTabKey);
         },
         page: RemotePage(
-          key: ValueKey(peerId),
+          key: ValueKey(initTabKey),
           id: peerId!,
+          tabKey: initTabKey,
           sessionId: sessionId == null ? null : SessionID(sessionId),
           tabWindowId: tabWindowId,
           display: display,
@@ -121,7 +169,7 @@ class _ConnectionTabPageState extends State<ConnectionTabPage> {
           windowId: windowId(),
           peerId: tabController.state.value.tabs.isEmpty
               ? null
-              : tabController.state.value.tabs[0].key,
+              : _peerIdFromTabKey(tabController.state.value.tabs[0].key),
           display: _display,
         );
       });
@@ -131,7 +179,7 @@ class _ConnectionTabPageState extends State<ConnectionTabPage> {
   @override
   Widget build(BuildContext context) {
     final child = Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: Theme.of(context).colorScheme.surface,
       body: DesktopTab(
         controller: tabController,
         onWindowCloseButton: handleWindowCloseButton,
@@ -144,9 +192,10 @@ class _ConnectionTabPageState extends State<ConnectionTabPage> {
         ),
         selectedBorderColor: MyTheme.accent,
         pageViewBuilder: (pageView) => pageView,
-        labelGetter: DesktopTab.tablabelGetter,
+        labelGetter: (key) => RxString(_tabLabel(key)),
         tabBuilder: (key, icon, label, themeConf) => Obx(() {
-          final connectionType = ConnectionTypeState.find(key);
+          final peerId = _peerIdFromTabKey(key);
+          final connectionType = ConnectionTypeState.find(peerId);
           if (!connectionType.isValid()) {
             return Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -163,7 +212,7 @@ class _ConnectionTabPageState extends State<ConnectionTabPage> {
             String msgConn = getConnectionText(
                 secure, direct, connectionType.stream_type.value);
             var msgFingerprint = '${translate('Fingerprint')}:\n';
-            var fingerprint = FingerprintState.find(key).value;
+            var fingerprint = FingerprintState.find(peerId).value;
             if (fingerprint.isEmpty) {
               fingerprint = 'N/A';
             }
@@ -188,7 +237,7 @@ class _ConnectionTabPageState extends State<ConnectionTabPage> {
                   ).paddingOnly(right: 5),
                 ),
                 label,
-                unreadMessageCountBuilder(UnreadChatCountState.find(key))
+                unreadMessageCountBuilder(UnreadChatCountState.find(peerId))
                     .marginOnly(left: 4),
               ],
             );
@@ -320,7 +369,8 @@ class _ConnectionTabPageState extends State<ConnectionTabPage> {
           translate('Copy Fingerprint'),
           style: style,
         ),
-        proc: () => onCopyFingerprint(FingerprintState.find(key).value),
+        proc: () => onCopyFingerprint(
+          FingerprintState.find(_peerIdFromTabKey(key)).value),
         padding: padding,
         dismissOnClicked: true,
         dismissCallback: cancelFunc,
@@ -331,8 +381,9 @@ class _ConnectionTabPageState extends State<ConnectionTabPage> {
           style: style,
         ),
         proc: () async {
+          final id = _peerIdFromTabKey(key);
           if (await desktopTryShowTabAuditDialogCloseCancelled(
-            id: key,
+            id: id,
             tabController: tabController,
           )) {
             return;
@@ -359,6 +410,7 @@ class _ConnectionTabPageState extends State<ConnectionTabPage> {
   }
 
   void onRemoveId(String id) async {
+    final peerId = _peerIdFromTabKey(id);
     if (tabController.state.value.tabs.isEmpty) {
       // Keep calling until the window status is hidden.
       //
@@ -379,9 +431,11 @@ class _ConnectionTabPageState extends State<ConnectionTabPage> {
 
       loopCloseWindow();
     }
-    ConnectionTypeState.delete(id);
+    if (!_hasPeerTabs(peerId)) {
+      ConnectionTypeState.delete(peerId);
+      stateGlobal.relativeMouseModeState.remove(peerId);
+    }
     // Clean up relative mouse mode state for this peer.
-    stateGlobal.relativeMouseModeState.remove(id);
     _update_remote_count();
   }
 
@@ -393,7 +447,7 @@ class _ConnectionTabPageState extends State<ConnectionTabPage> {
     final connLength = tabController.length;
     if (connLength == 1) {
       if (await desktopTryShowTabAuditDialogCloseCancelled(
-        id: tabController.state.value.tabs[0].key,
+        id: _peerIdFromTabKey(tabController.state.value.tabs[0].key),
         tabController: tabController,
       )) {
         return false;
@@ -434,6 +488,7 @@ class _ConnectionTabPageState extends State<ConnectionTabPage> {
       final tabWindowId = args['tab_window_id'];
       final display = args['display'];
       final displays = args['displays'];
+      final tabKey = _makeRemoteTabKey(id, display);
       final screenRect = parseParamScreenRect(args);
       final prePeerCount = tabController.length;
       Future.delayed(Duration.zero, () async {
@@ -449,22 +504,24 @@ class _ConnectionTabPageState extends State<ConnectionTabPage> {
       });
       ConnectionTypeState.init(id);
       tabController.add(TabInfo(
-        key: id,
-        label: id,
+        key: tabKey,
+        label: _tabLabel(tabKey),
         selectedIcon: selectedIcon,
         unselectedIcon: unselectedIcon,
         onTabCloseButton: () async {
+          final closePeerId = _peerIdFromTabKey(tabKey);
           if (await desktopTryShowTabAuditDialogCloseCancelled(
-            id: id,
+            id: closePeerId,
             tabController: tabController,
           )) {
             return;
           }
-          tabController.closeBy(id);
+          tabController.closeBy(tabKey);
         },
         page: RemotePage(
-          key: ValueKey(id),
+          key: ValueKey(tabKey),
           id: id,
+          tabKey: tabKey,
           sessionId: sessionId == null ? null : SessionID(sessionId),
           tabWindowId: tabWindowId,
           display: display,
@@ -500,7 +557,8 @@ class _ConnectionTabPageState extends State<ConnectionTabPage> {
       return jumpOk;
     } else if (call.method == kWindowEventGetRemoteList) {
       return tabController.state.value.tabs
-          .map((e) => e.key)
+          .map((e) => _peerIdFromTabKey(e.key))
+          .toSet()
           .toList()
           .join(',');
     } else if (call.method == kWindowEventGetSessionIdList) {
@@ -516,7 +574,8 @@ class _ConnectionTabPageState extends State<ConnectionTabPage> {
             final pi = page.ffi.ffiModel.pi;
             final rect = page.ffi.ffiModel.displaysRect();
             return {
-              'id': e.key,
+              'id': _peerIdFromTabKey(e.key),
+              'tab_key': e.key,
               'session_id': page.ffi.sessionId.toString(),
               'display_count': pi.displays.length,
               'current_display': pi.currentDisplay,
@@ -526,7 +585,8 @@ class _ConnectionTabPageState extends State<ConnectionTabPage> {
           } catch (ex) {
             debugPrint('Failed to get session display meta for tab: $ex');
             return {
-              'id': e.key,
+              'id': _peerIdFromTabKey(e.key),
+              'tab_key': e.key,
               'session_id': '',
               'display_count': 0,
               'current_display': -1,
@@ -545,17 +605,20 @@ class _ConnectionTabPageState extends State<ConnectionTabPage> {
       final args = jsonDecode(call.arguments);
       final id = args['id'];
       final close = args['close'];
+      TabInfo? targetTab;
       try {
-        final remotePage = tabController.state.value.tabs
-            .firstWhere((tab) => tab.key == id)
-            .page as RemotePage;
+        targetTab = tabController.state.value.tabs.firstWhere(
+            (tab) => tab.key == id,
+            orElse: () => tabController.state.value.tabs.firstWhere(
+                (tab) => _peerIdFromTabKey(tab.key) == id));
+        final remotePage = targetTab.page as RemotePage;
         returnValue = remotePage.ffi.ffiModel.cachedPeerData.toString();
       } catch (e) {
         debugPrint('Failed to get cached session data: $e');
       }
-      if (close && returnValue != null) {
-        closeSessionOnDispose[id] = false;
-        tabController.closeBy(id);
+      if (close && returnValue != null && targetTab != null) {
+        closeSessionOnDispose[targetTab.key] = false;
+        tabController.closeBy(targetTab.key);
       }
     } else if (call.method == kWindowEventRemoteWindowCoords) {
       final remotePage =
