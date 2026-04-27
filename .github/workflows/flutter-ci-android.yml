@@ -185,7 +185,7 @@ jobs:
           ./flutter/ndk_arm64.sh
           # Copy built library to expected location
           mkdir -p ./flutter/android/app/src/main/jniLibs/arm64-v8a
-          cp target/aarch64-linux-android/release/liblibrustdesk.so ./flutter/android/app/src/main/jniLibs/arm64-v8a/
+          cp target/aarch64-linux-android/release/liblibrustdesk.so ./flutter/android/app/src/main/jniLibs/arm64-v8a/librustdesk.so
 
       - name: Build rustdesk
         shell: bash
